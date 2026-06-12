@@ -1,7 +1,7 @@
 # Relatório de Acompanhamento de Projeto
 
 ## Nome do projeto
-[cite_start]BoraObra [cite: 1]
+BoraObra
 
 ## Nome completo dos integrantes da equipe
 * [cite_start]Felipe Matos Carvalho 
