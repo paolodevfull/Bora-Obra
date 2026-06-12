@@ -3,13 +3,13 @@
 ## Nome do projeto
 BoraObra
 
-## Nome completo dos integrantes da equipe
-* [cite_start]Felipe Matos Carvalho 
-* [cite_start]Miguel Dias Xavier Lopes 
-* [cite_start]Moisés Caldeira Brant
-* [cite_start]Murilo Dias Oliveira 
-* [cite_start]Otávio Cesar Nunes de Oliveira 
-* [cite_start]Paolo Eduardo Monteiro Lopes de Andrade 
+## Integrantes da equipe
+* Felipe Matos Carvalho 
+* Miguel Dias Xavier Lopes 
+* Moisés Caldeira Brant
+* Murilo Dias Oliveira 
+* Otávio Cesar Nunes de Oliveira 
+* Paolo Eduardo Monteiro Lopes de Andrade 
 
 ---
 
