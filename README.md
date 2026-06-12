@@ -1,7 +1,5 @@
-# Relatório de Acompanhamento de Projeto
 
-## Nome do projeto
-BoraObra
+## BoraObra
 
 ## Integrantes da equipe
 * Felipe Matos Carvalho 
