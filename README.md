@@ -15,16 +15,16 @@ BoraObra
 
 ## Stack utilizada no projeto
 
-* **Frontend:**HTML/CSS/JavaScript
+* **Frontend:** HTML/CSS/JavaScript
 * **Backend:** Python (Flask)
-* **Banco de Dados:**Flask SQL Alchemy, MySQL, SqlLite
+* **Banco de Dados:** Flask SQL Alchemy, MySQL, SqlLite
 
 ---
 
 ## Breve descrição do sistema
-[cite_start]O **BoraObra** é um marketplace B2B2C voltado para o mercado de construção civil de bairro e pequenas locadoras de ferramentas[cite: 10, 14]. [cite_start]O sistema tem como objetivo principal solucionar os gargalos causados pela baixa digitalização do setor (como o uso de anotações em papel e erros de estoque), consolidando os serviços de venda, locação e entrega em uma única plataforma[cite: 10, 11, 12, 15]. 
+O **BoraObra** é um marketplace B2B2C voltado para o mercado de construção civil de bairro e pequenas locadoras de ferramentas. O sistema tem como objetivo principal solucionar os gargalos causados pela baixa digitalização do setor (como o uso de anotações em papel e erros de estoque), consolidando os serviços de venda, locação e entrega em uma única plataforma. 
 
-[cite_start]Entre as principais funcionalidades mapeadas estão o gerenciamento de um estoque virtual com cálculo de lucro em tempo real [cite: 156][cite_start], uma interface simplificada para ativação/desativação de itens de alto giro (Curva A) [cite: 157][cite_start], expedição ágil integrada a impressoras térmicas [cite: 159] [cite_start]e processamento seguro de transações financeiras com divisão automática de pagamentos (*split*)[cite: 160].
+Entre as principais funcionalidades mapeadas estão o gerenciamento de um estoque virtual com cálculo de lucro em tempo real, uma interface simplificada para ativação/desativação de itens de alto giro (Curva A), expedição ágil integrada a impressoras térmicas e processamento seguro de transações financeiras com divisão automática de pagamentos (**split**).
 
 ---
 
