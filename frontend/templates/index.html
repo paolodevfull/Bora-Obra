@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Painel — Produtos{% endblock %}
+
+{% block content %}
+<h1>Produtos - Bora Obra</h1>
+
+<div class="cards">
+    <div class="card">
+        <span class="card-num">{{ total_produtos }}</span>
+        <span class="card-label">Produtos</span>
+    </div>
+</div>
+
+<p><a class="btn" href="{{ url_for('produto.index') }}">Ver produtos</a></p>
+{% endblock %}
