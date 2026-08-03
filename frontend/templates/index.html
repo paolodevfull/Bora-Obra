@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bora Obra - Painel Principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            color: #666;
+            margin-top: 0;
+        }
+        .status-box {
+            background-color: #e9f7ef;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        .btn-link {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .btn-link:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏗️ Bora Obra</h1>
+        <p class="subtitle">Painel de Gerenciamento da API e Módulos</p>
+        <div class="status-box" id="api-status">
+            Verificando status da API...
+        </div>
+    </header>
+
+    <main class="grid-container">
+        <!-- Card: Usuários -->
+        <div class="card">
+            <h3>👤 Usuários</h3>
+            <p>Gerencie o cadastro de clientes e lojistas da plataforma.</p>
+            <a href="/usuarios" class="btn-link">Acessar Usuários</a>
+        </div>
+
+        <!-- Card: Lojas (Próximo Módulo) -->
+        <div class="card">
+            <h3>🏪 Lojas</h3>
+            <p>Visualize e cadastre os estabelecimentos parceiros.</p>
+            <a href="/lojas" class="btn-link">Acessar Lojas</a>
+        </div>
+
+        <!-- Card: Produtos (Próximo Módulo) -->
+        <div class="card">
+            <h3>📦 Produtos</h3>
+            <p>Gerencie o catálogo de produtos e seus preços.</p>
+            <a href="/produtos" class="btn-link">Acessar Produtos</a>
+        </div>
+
+        <!-- Card: Pedidos (Próximo Módulo) -->
+        <div class="card">
+            <h3>🛒 Pedidos</h3>
+            <p>Acompanhe e crie novos pedidos e entregas.</p>
+            <a href="/pedidos" class="btn-link">Acessar Pedidos</a>
+        </div>
+    </main>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
