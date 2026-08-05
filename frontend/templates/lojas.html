@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bora Obra - Gerenciamento de Lojas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        nav { margin-bottom: 20px; }
+        nav a { margin-right: 15px; text-decoration: none; color: #28a745; font-weight: bold; }
+        .box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 650px; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, textarea, button { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        textarea { resize: vertical; height: 60px; }
+        button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/usuarios">Usuários</a>
+        <a href="/lojas">Lojas</a>
+    </nav>
+
+    <div class="box">
+        <h2>2. Cadastrar Loja</h2>
+        <form id="form-loja">
+            <label for="loja-nome">Nome da Loja:</label>
+            <input type="text" id="loja-nome" required placeholder="Ex: Construções Silva">
+
+            <label for="loja-cnpj">CNPJ:</label>
+            <input type="text" id="loja-cnpj" required placeholder="00.000.000/0001-00">
+
+            <label for="loja-localizacao">Localização:</label>
+            <input type="text" id="loja-localizacao" required placeholder="Ex: Av. Principal, 100 - Centro">
+
+            <label for="loja-user-id">ID do Lojista (User ID):</label>
+            <input type="number" id="loja-user-id" required placeholder="Ex: 1">
+
+            <label for="loja-catalogo">Catálogo de Ferramentas (Opcional):</label>
+            <textarea id="loja-catalogo" placeholder="Ex: Ferramentas elétricas, materiais para alvenaria..."></textarea>
+
+            <button type="submit">Cadastrar Loja</button>
+        </form>
+
+        <hr style="margin-top: 25px;">
+
+        <h3>Lojas Cadastradas:</h3>
+        <button type="button" onclick="carregarLojas()" style="margin-bottom: 15px;">Atualizar Lista</button>
+
+        <table border="1" style="width: 100%; text-align: left; border-collapse: collapse; background: #fff;">
+            <thead>
+                <tr style="background-color: #28a745; color: white;">
+                    <th style="padding: 8px;">ID</th>
+                    <th style="padding: 8px;">Nome</th>
+                    <th style="padding: 8px;">CNPJ</th>
+                    <th style="padding: 8px;">Localização</th>
+                    <th style="padding: 8px;">User ID</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-lojas-body">
+                <tr>
+                    <td colspan="5" style="padding: 8px; text-align: center;">Carregando lojas...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Script exclusivo da tela de lojas -->
+    <script src="/static/js/lojas.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from . import db
+from backend.database.database import db
 from .base_model import ModeloBase
 
 class Produto(ModeloBase):
@@ -11,3 +11,6 @@ class Produto(ModeloBase):
     cor_tamanho = db.Column(db.String(50))
     preco_venda = db.Column(db.Float, nullable=False)
     preco_locacao = db.Column(db.Float)
+    
+    # Vinculação obrigatória com a Loja
+    loja_id = db.Column(db.Integer, db.ForeignKey('lojas.id'), nullable=False)

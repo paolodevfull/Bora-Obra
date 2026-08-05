@@ -13,6 +13,20 @@ def home():
 def pagina_usuarios():
     return render_template("usuarios.html")
 
+@index_bp.route("/lojas", methods=["GET"])
+def pagina_lojas():
+    return render_template("lojas.html")
+
+
+@index_bp.route("/produtos", methods=["GET"])
+def pagina_produtos():
+    return render_template("produtos.html")
+
+@index_bp.route("/pedidos", methods=["GET"])
+def pagina_pedidos():
+    return render_template("pedidos.html")
+
+    
 # Rota de Status da API
 @index_bp.route("/api/status", methods=["GET"])
 def status():

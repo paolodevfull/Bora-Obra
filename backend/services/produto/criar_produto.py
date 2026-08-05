@@ -13,7 +13,8 @@ def criar_produto_service(dados: dict) -> dict:
         categoria=dados.get('categoria'),
         cor_tamanho=dados.get('cor_tamanho'),
         preco_venda=dados.get('preco_venda'),
-        preco_locacao=dados.get('preco_locacao')
+        preco_locacao=dados.get('preco_locacao'),
+        loja_id=dados.get('loja_id')
     )
 
     db.session.add(novo_produto)

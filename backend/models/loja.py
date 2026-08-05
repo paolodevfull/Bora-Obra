@@ -1,4 +1,4 @@
-from . import db
+from backend.database.database import db
 from .base_model import ModeloBase
 
 
