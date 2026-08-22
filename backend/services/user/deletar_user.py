@@ -1,11 +1,8 @@
-from backend.database.database import db
 from backend.models.user import User
 
-def deletar_user_service(user_id: int):
-    usuario = User.query.get(user_id)
-    if not usuario:
-        raise KeyError("Usuário não encontrado.")
-
-    db.session.delete(usuario)
-    db.session.commit()
-    return True
+class DeletarUserService:
+    def executar(self, id_user: int):
+        usuario = User.buscar_por_id(id_user)
+        if not usuario:
+            raise ValueError("Usuário não encontrado.")
+        usuario.deletar()

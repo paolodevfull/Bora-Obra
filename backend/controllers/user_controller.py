@@ -1,61 +1,47 @@
 from flask import Blueprint, request, jsonify
-from backend.services.user.criar_user import criar_user_service
-from backend.models.user import User
+from backend.services.user.criar_user import CriarUserService
+from backend.services.user.listar_user import ListarUserService
+from backend.services.user.editar_user import EditarUserService
+from backend.services.user.deletar_user import DeletarUserService
 
-user_bp = Blueprint('users', __name__, url_prefix='/api/users')
+user_bp = Blueprint('user_bp', __name__, url_prefix='/api/users')
 
-# GET: Listar todos os usuários
-@user_bp.route('', methods=['GET'])
-def listar_usuarios():
-    users = User.query.all()
-    # Mapeando manualmente para não depender de u.to_dict()
-    lista = [
-        {
-            "id": u.id,
-            "nome": u.nome,
-            "email": u.email,
-            "tipo": u.tipo
-        } for u in users
-    ]
-    return jsonify(lista), 200
+class UserController:
 
+    @staticmethod
+    @user_bp.route('', methods=['POST'])
+    def criar():
+        try:
+            dados = request.get_json()
+            service = CriarUserService()
+            usuario = service.executar(dados)
+            return jsonify(usuario), 201
+        except ValueError as e:
+            return jsonify({'erro': str(e)}), 400
 
-# GET: Buscar usuário por ID
-@user_bp.route('/<int:id>', methods=['GET'])
-def buscar_usuario(id):
-    user = User.query.get_or_404(id)
-    return jsonify({
-        "id": user.id,
-        "nome": user.nome,
-        "email": user.email,
-        "tipo": user.tipo
-    }), 200
+    @staticmethod
+    @user_bp.route('', methods=['GET'])
+    def listar():
+        service = ListarUserService()
+        return jsonify(service.executar()), 200
 
+    @staticmethod
+    @user_bp.route('/<int:id>', methods=['PUT'])
+    def editar(id):
+        try:
+            dados = request.get_json()
+            service = EditarUserService()
+            usuario = service.executar(id, dados)
+            return jsonify(usuario), 200
+        except ValueError as e:
+            return jsonify({'erro': str(e)}), 400
 
-# POST: Criar novo usuário (usando a Service Layer)
-@user_bp.route('', methods=['POST'])
-def criar_usuario():
-    try:
-        dados = request.get_json() or {}
-        
-        # Garante valores padrões para testes caso não venham no formulário
-        if 'senha' not in dados or not dados['senha']:
-            dados['senha'] = '123456'
-            
-        novo_usuario = criar_user_service(dados)
-        return jsonify(novo_usuario), 201
-
-    except ValueError as e:
-        return jsonify({'erro': str(e)}), 400
-    except Exception as e:
-        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
-
-
-# DELETE: Deletar usuário
-@user_bp.route('/<int:id>', methods=['DELETE'])
-def deletar_usuario(id):
-    user = User.query.get_or_404(id)
-    from backend.database.database import db
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({'mensagem': 'Usuário removido com sucesso'}), 200
+    @staticmethod
+    @user_bp.route('/<int:id>', methods=['DELETE'])
+    def deletar(id):
+        try:
+            service = DeletarUserService()
+            service.executar(id)
+            return jsonify({'mensagem': 'Usuário removido com sucesso'}), 200
+        except ValueError as e:
+            return jsonify({'erro': str(e)}), 400

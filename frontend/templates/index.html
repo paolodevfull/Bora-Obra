@@ -1,121 +1,327 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bora Obra - Painel Principal</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        h1 {
-            color: #28a745;
-            margin-bottom: 5px;
-        }
-        p.subtitle {
-            color: #666;
-            margin-top: 0;
-        }
-        .status-box {
-            background-color: #e9f7ef;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        .card h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        .card p {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-        }
-        .btn-link {
-            display: inline-block;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        .btn-link:hover {
-            background-color: #218838;
-        }
-    </style>
+    <title>BoraObra - Painel de Gestão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body class="bg-dark">
 
-    <header>
-        <h1>🏗️ Bora Obra</h1>
-        <p class="subtitle">Painel de Gerenciamento da API e Módulos</p>
-        <div class="status-box" id="api-status">
-            Verificando status da API...
+    <!-- TELA DE LOGIN OVERLAY -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fa-solid fa-helmet-safety logo-icon"></i>
+                <h2>BoraObra</h2>
+                <p>A ferramenta certa, na hora certa.</p>
+            </div>
+            <form id="form-login" onsubmit="realizarLogin(event)">
+                <div class="input-group">
+                    <label>E-mail</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Senha</label>
+                    <input type="password" id="login-senha" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Entrar no Sistema</button>
+            </form>
         </div>
-    </header>
+    </div>
 
-    <main class="grid-container">
-        <!-- Card: Usuários -->
-        <div class="card">
-            <h3>👤 Usuários</h3>
-            <p>Gerencie o cadastro de clientes e lojistas da plataforma.</p>
-            <a href="/usuarios" class="btn-link">Acessar Usuários</a>
+    <!-- ESTRUTURA PRINCIPAL DESKTOP -->
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-helmet-safety"></i>
+                <span>BoraObra</span>
+            </div>
+            <nav class="sidebar-menu">
+                <button class="menu-btn active" onclick="trocarAba('tab-dashboard', this)">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </button>
+                <button class="menu-btn" onclick="trocarAba('tab-lojas', this)">
+                    <i class="fa-solid fa-store"></i> Lojas
+                </button>
+                <button class="menu-btn" onclick="trocarAba('tab-usuarios', this)">
+                    <i class="fa-solid fa-users"></i> Usuários / Compradores
+                </button>
+                <button class="menu-btn" onclick="trocarAba('tab-produtos', this)">
+                    <i class="fa-solid fa-boxes-stacked"></i> Produtos
+                </button>
+                <button class="menu-btn" onclick="trocarAba('tab-vendas', this)">
+                    <i class="fa-solid fa-receipt"></i> Vendas / Pedidos
+                </button>
+            </nav>
+            <div class="user-profile">
+                <i class="fa-solid fa-user-circle"></i>
+                <div class="user-details">
+                    <span id="user-display-name">Operador</span>
+                    <small>Online</small>
+                </div>
+                <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </aside>
+
+        <!-- Área de Conteúdo -->
+        <main class="main-content">
+
+            <!-- 1. DASHBOARD -->
+            <section id="tab-dashboard" class="content-section active">
+                <header class="section-header">
+                    <h2>Visão Geral do Sistema</h2>
+                    <button class="btn-secondary" onclick="carregarRelatorioLucro()"><i class="fa-solid fa-arrows-rotate"></i> Atualizar Dados</button>
+                </header>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <i class="fa-solid fa-wallet"></i>
+                        <div>
+                            <small>Faturamento Total</small>
+                            <h3 id="dash-faturamento">R$ 0,00</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <div>
+                            <small>Total de Pedidos</small>
+                            <h3 id="dash-pedidos">0</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card highlight">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <div>
+                            <small>Lucro Estimado (35%)</small>
+                            <h3 id="dash-lucro">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. LOJAS -->
+            <section id="tab-lojas" class="content-section">
+                <header class="section-header">
+                    <h2>Gestão de Lojas e Unidades</h2>
+                </header>
+                <div class="grid-2col">
+                    <div class="form-card">
+                        <h3>Cadastrar Nova Loja</h3>
+                        <form id="form-cad-loja" onsubmit="cadastrarLoja(event)">
+                            <div class="input-group">
+                                <label>Nome da Loja / Depósito</label>
+                                <input type="text" id="loja-nome" required placeholder="Ex: BoraObra Centro">
+                            </div>
+                            <div class="input-group">
+                                <label>Endereço Completo</label>
+                                <input type="text" id="loja-endereco" required placeholder="Av. Principal, 1000">
+                            </div>
+                            <div class="input-group">
+                                <label>Telefone / WhatsApp</label>
+                                <input type="text" id="loja-telefone" placeholder="(31) 99999-9999">
+                            </div>
+                            <button type="submit" class="btn-primary">Salvar Loja</button>
+                        </form>
+                    </div>
+                    <div class="table-card">
+                        <h3>Lojas Cadastradas</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Endereço</th>
+                                    <th>Telefone</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-lojas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. USUÁRIOS / COMPRADORES -->
+            <section id="tab-usuarios" class="content-section">
+                <header class="section-header">
+                    <h2>Gestão de Usuários e Compradores</h2>
+                </header>
+                <div class="grid-2col">
+                    <div class="form-card">
+                        <h3>Cadastrar Novo Usuário</h3>
+                        <form id="form-cad-user" onsubmit="cadastrarUsuario(event)">
+                            <div class="input-group">
+                                <label>Nome Completo</label>
+                                <input type="text" id="user-nome" required placeholder="Ex: João da Silva">
+                            </div>
+                            <div class="input-group">
+                                <label>E-mail</label>
+                                <input type="email" id="user-email" required placeholder="joao@email.com">
+                            </div>
+                            <div class="input-group">
+                                <label>Tipo de Conta</label>
+                                <select id="user-tipo">
+                                    <option value="cliente">Cliente (Comprador)</option>
+                                    <option value="lojista">Lojista</option>
+                                    <option value="entregador">Entregador</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Cadastrar Usuário</button>
+                        </form>
+                    </div>
+                    <div class="table-card">
+                        <h3>Usuários Cadastrados</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-usuarios"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. PRODUTOS (ASSOCIADO À LOJA) -->
+            <section id="tab-produtos" class="content-section">
+                <header class="section-header">
+                    <h2>Catálogo de Produtos</h2>
+                </header>
+                <div class="grid-2col">
+                    <div class="form-card">
+                        <h3>Cadastrar Produto</h3>
+                        <form id="form-cad-prod" onsubmit="cadastrarProduto(event)">
+                            <div class="input-group">
+                                <label>Loja Responsável</label>
+                                <select id="prod-loja-select" required>
+                                    <option value="">Carregando lojas...</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Nome do Produto</label>
+                                <input type="text" id="prod-nome" placeholder="Ex: Betoneira 400L" required>
+                            </div>
+                            <div class="grid-inputs">
+                                <div class="input-group">
+                                    <label>Categoria</label>
+                                    <input type="text" id="prod-categoria" placeholder="Maquinário">
+                                </div>
+                                <div class="input-group">
+                                    <label>Utilidade / Etapa</label>
+                                    <input type="text" id="prod-utilidade" placeholder="Concretagem">
+                                </div>
+                            </div>
+                            <div class="grid-inputs">
+                                <div class="input-group">
+                                    <label>Preço Venda (R$)</label>
+                                    <input type="number" step="0.01" id="prod-preco-venda" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Preço Locação (R$)</label>
+                                    <input type="number" step="0.01" id="prod-preco-locacao" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">Salvar Produto</button>
+                        </form>
+                    </div>
+                    <div class="table-card">
+                        <h3>Produtos Cadastrados</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Utilidade</th>
+                                    <th>Valores (Venda / Locação)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-produtos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. PEDIDOS (ASSOCIADO A COMPRADOR, LOJA E PRODUTO) -->
+            <section id="tab-vendas" class="content-section">
+                <header class="section-header">
+                    <h2>Gestão de Vendas e Pedidos</h2>
+                </header>
+                <div class="grid-2col">
+                    <div class="form-card">
+                        <h3>Registrar Nova Venda</h3>
+                        <form id="form-cad-pedido" onsubmit="cadastrarPedido(event)">
+                            <div class="input-group">
+                                <label>Cliente / Comprador</label>
+                                <select id="ped-user-select" required>
+                                    <option value="">Carregando usuários...</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Loja de Origem</label>
+                                <select id="ped-loja-select" required>
+                                    <option value="">Carregando lojas...</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Produto Selecionado</label>
+                                <select id="ped-prod-select" onchange="atualizarValorAutomatico()" required>
+                                    <option value="">Carregando produtos...</option>
+                                </select>
+                            </div>
+                            <div class="grid-inputs">
+                                <div class="input-group">
+                                    <label>Tipo Operação</label>
+                                    <select id="ped-tipo" onchange="atualizarValorAutomatico()">
+                                        <option value="Venda">Venda</option>
+                                        <option value="Locacao">Locação</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Valor Total (R$)</label>
+                                    <input type="number" step="0.01" id="ped-valor" required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Observação</label>
+                                <input type="text" id="ped-obs" placeholder="Ex: Entregar com urgência na obra">
+                            </div>
+                            <button type="submit" class="btn-primary">Criar Pedido</button>
+                        </form>
+                    </div>
+                    <div class="table-card">
+                        <h3>Histórico de Pedidos</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo</th>
+                                    <th>Valor Total</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-pedidos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL TICKET TÉRMICO -->
+    <div id="ticket-modal" class="modal-overlay hidden">
+        <div class="ticket-card">
+            <pre id="ticket-content"></pre>
+            <button class="btn-secondary" onclick="fecharTicket()">Fechar Ticket</button>
         </div>
+    </div>
 
-        <!-- Card: Lojas (Próximo Módulo) -->
-        <div class="card">
-            <h3>🏪 Lojas</h3>
-            <p>Visualize e cadastre os estabelecimentos parceiros.</p>
-            <a href="/lojas" class="btn-link">Acessar Lojas</a>
-        </div>
-
-        <!-- Card: Produtos (Próximo Módulo) -->
-        <div class="card">
-            <h3>📦 Produtos</h3>
-            <p>Gerencie o catálogo de produtos e seus preços.</p>
-            <a href="/produtos" class="btn-link">Acessar Produtos</a>
-        </div>
-
-        <!-- Card: Pedidos (Próximo Módulo) -->
-        <div class="card">
-            <h3>🛒 Pedidos</h3>
-            <p>Acompanhe e crie novos pedidos e entregas.</p>
-            <a href="/pedidos" class="btn-link">Acessar Pedidos</a>
-        </div>
-    </main>
-
-    <script src="/static/js/main.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

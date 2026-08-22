@@ -1,23 +1,19 @@
-from backend.database.database import db
-from backend.models.pedido import Pedidos
+from datetime import datetime
+from backend.models.pedido import Pedido
 
-def criar_pedido_service(dados):
-    user_id = dados.get('user_id')
-    loja_id = dados.get('loja_id')
-
-    if not user_id or not loja_id:
-        raise ValueError("Os campos 'user_id' e 'loja_id' são obrigatórios.")
-
-    novo_pedido = Pedidos(
-        user_id=user_id,
-        loja_id=loja_id,
-        tipo=dados.get('tipo'),
-        valor_total=dados.get('valor_total'),
-        observacao=dados.get('observacao'),
-        status='Pendente'
-    )
-
-    db.session.add(novo_pedido)
-    db.session.commit()
-
-    return novo_pedido.to_dict()
+class CriarPedidoService:
+    def executar(self, dados: dict):
+        if not dados.get('user_id') or not dados.get('loja_id'):
+            raise ValueError("Usuário e Loja são obrigatórios.")
+            
+        pedido = Pedido(
+            user_id=dados['user_id'],
+            loja_id=dados['loja_id'],
+            status=dados.get('status', 'Pendente'),
+            tipo=dados.get('tipo', 'Venda'),
+            valor_total=float(dados.get('valor_total', 0.0)),
+            observacao=dados.get('observacao'),
+            created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+        pedido.salvar()
+        return pedido.to_dict()

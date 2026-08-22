@@ -1,17 +1,38 @@
 from backend.database.database import db
-from .base_model import ModeloBase
 
-
-class Loja(ModeloBase):
-
+class Loja(db.Model):
     __tablename__ = 'lojas'
-    
+
+    id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    cnpj = db.Column(db.String(18), unique=True, nullable=False)
-    localizacao = db.Column(db.String(255), nullable=False)
-    catalogo_ferramentas = db.Column(db.Text)
-    
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    
-    estoques = db.relationship('Estoque', backref='loja', lazy=True)
-    pedidos = db.relationship('Pedidos', backref='loja', lazy=True)
+    endereco = db.Column(db.String(200), nullable=False)
+    telefone = db.Column(db.String(20))
+
+    def salvar(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def atualizar(self):
+        db.session.commit()
+        return self
+
+    def deletar(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def listar_todos(cls):
+        return cls.query.all()
+
+    @classmethod
+    def buscar_por_id(cls, id_loja):
+        return cls.query.get(id_loja)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "endereco": self.endereco,
+            "telefone": self.telefone
+        }

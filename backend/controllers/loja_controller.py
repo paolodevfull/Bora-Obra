@@ -1,31 +1,33 @@
 from flask import Blueprint, request, jsonify
-from backend.database import db
-from backend.models.loja import Loja
+from backend.services.loja.criar_loja import CriarLojaService
+from backend.services.loja.listar_lojas import ListarLojasService
 
-loja_bp = Blueprint('lojas', __name__, url_prefix='/api/lojas')
+loja_bp = Blueprint('loja_bp', __name__, url_prefix='/api/lojas')
 
-@loja_bp.route('', methods=['GET'])
-def listar_lojas():
-    lojas = Loja.query.all()
-    return jsonify([l.to_dict() for l in lojas]), 200
+class LojaController:
 
-@loja_bp.route('/<int:id>', methods=['GET'])
-def buscar_loja(id):
-    loja = Loja.query.get_or_404(id)
-    return jsonify(loja.to_dict()), 200
+    @staticmethod
+    @loja_bp.route('', methods=['POST'])
+    def criar():
+        try:
+            dados = request.get_json()
+            if not dados:
+                return jsonify({'erro': 'Corpo da requisição inválido ou vazio.'}), 400
 
-@loja_bp.route('', methods=['POST'])
-def criar_loja():
-    data = request.get_json()
-    
-    nova_loja = Loja(
-        nome=data.get('nome'),
-        cnpj=data.get('cnpj'),
-        localizacao=data.get('localizacao'),
-        catalogo_ferramentas=data.get('catalogo_ferramentas'),
-        user_id=data.get('user_id')
-    )
-    
-    db.session.add(nova_loja)
-    db.session.commit()
-    return jsonify(nova_loja.to_dict()), 201
+            service = CriarLojaService()
+            loja = service.executar(dados)
+            return jsonify(loja), 201
+        except ValueError as e:
+            return jsonify({'erro': str(e)}), 400
+        except Exception as e:
+            return jsonify({'erro': f'Erro interno no servidor: {str(e)}'}), 500
+
+    @staticmethod
+    @loja_bp.route('', methods=['GET'])
+    def listar():
+        try:
+            service = ListarLojasService()
+            lojas = service.executar()
+            return jsonify(lojas), 200
+        except Exception as e:
+            return jsonify({'erro': str(e)}), 500

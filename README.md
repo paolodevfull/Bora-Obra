@@ -1,37 +1,37 @@
-## BoraObra
+# BoraObra 🛠️
 
-## Integrantes da equipe
-* Felipe Matos Carvalho 
-* Miguel Dias Xavier Lopes 
-* Moisés Caldeira Brant
-* Murilo Dias Oliveira 
-* Otávio Cesar Nunes de Oliveira 
-* Paolo Eduardo Monteiro Lopes de Andrade 
+O **BoraObra** é uma plataforma desenvolvida para facilitar a gestão, locação e venda de equipamentos e suprimentos de construção civil. 
 
 ---
 
-## Stack utilizada no projeto
+## 🏗️ Arquitetura do Sistema
 
-* **Frontend:** HTML/CSS/JavaScript
-* **Backend:** Python (Flask)
-* **Banco de Dados:** Flask SQL Alchemy, MySQL, SqlLite
+O projeto adota uma arquitetura em camadas bem definida, priorizando o **Princípio da Responsabilidade Única (SRP)** e os padrões de projeto recomendados pela disciplina:
 
----
-
-## Breve descrição do sistema
-O **BoraObra** é um marketplace B2B2C voltado para o mercado de construção civil de bairro e pequenas locadoras de ferramentas. O sistema tem como objetivo principal solucionar os gargalos causados pela baixa digitalização do setor (como o uso de anotações em papel e erros de estoque), consolidando os serviços de venda, locação e entrega em uma única plataforma. 
-
-Entre as principais funcionalidades mapeadas estão o gerenciamento de um estoque virtual com cálculo de lucro em tempo real, uma interface simplificada para ativação/desativação de itens de alto giro (Curva A), expedição ágil integrada a impressoras térmicas e processamento seguro de transações financeiras com divisão automática de pagamentos (**split**).
+* **Controllers (Orientadas a Objetos):** Classes responsáveis pelo mapeamento das rotas Flask, tratando requisições HTTP e retornando respostas em formato JSON.
+* **Services (Casos de Uso):** Classes isoladas por funcionalidade (uma classe/arquivo por caso de uso), contendo as regras de negócio do sistema.
+* **Models (SQLAlchemy):** Classes de domínio herdando de `db.Model`, integradas com os métodos de persistência convencionais (`salvar()`, `atualizar()`, `deletar()`, `listar_todos()`, `buscar_por_id()`).
+* **Repositories:** Camada responsável por abstrair consultas complexas, filtros dinâmicos e geração de dados para relatórios sem poluir as Models nem os Services.
 
 ---
 
-## Instruções básicas para executar o projeto
-> ⚠️ **Nota:** Instruções técnicas de inicialização do ambiente de desenvolvimento devem ser extraídas diretamente do código-fonte ou do arquivo `README.md` principal do repositório.
+## 🚀 10 Funcionalidades Implementadas
 
-### Pré-requisitos
-* Python 3.10+
+1. **Cadastrar Usuário:** Registro completo de usuários (clientes, lojistas e entregadores).
+2. **Cadastrar Loja:** Cadastro e gerenciamento das unidades e lojas parceiras.
+3. **Cadastrar Produto:** Registro de itens com suporte a valores de venda e locação.
+4. **Listar Produtos:** Consulta e exibição do catálogo geral de produtos cadastrados.
+5. **Alternar Disponibilidade de Produto (Toggle Curva A):** Permite ativar ou desativar rapidamente a disponibilidade de um item para locação/venda imediata.
+6. **Buscar Produtos por Utilidade/Obra e Categoria:** Filtro dinâmico e avançado via Repository para localizar materiais específicos pela etapa da obra ou utilidade.
+7. **Registrar Pedido:** Criação e vinculo de novos pedidos associando o cliente e a loja responsável.
+8. **Consultar Histórico de Pedidos:** Listagem detalhada dos pedidos realizados no sistema.
+9. **Gerar Ticket Térmico de Expedição:** Emissão de comanda formatada para impressão/envio ao entregador ou motoboy com resumo do pedido e endereço.
+10. **Gerar Relatório Financeiro e Lucro Diário:** Dashboard consolidado via Repository com faturamento total do dia e estimativa de lucro bruto.
 
-### Passo a passo para execução
-1. **Clonar o repositório:**
-   ```bash
-   git clone [https://github.com/usuario/boraobra.git](https://github.com/usuario/boraobra.git)
+---
+
+## 💻 Tecnologias Utilizadas
+
+* **Backend:** Python, Flask, Flask-SQLAlchemy, SQLite
+* **Frontend:** HTML5, CSS3, JavaScript
+* **Arquitetura:** MVC / Layered Architecture com Pattern Repository e Service-Oriented Use Cases

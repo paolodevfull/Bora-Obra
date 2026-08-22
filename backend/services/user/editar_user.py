@@ -1,15 +1,13 @@
-from backend.database.database import db
 from backend.models.user import User
 
-def editar_user_service(user_id: int, dados: dict) -> dict:
-    usuario = User.query.get(user_id)
-    if not usuario:
-        raise KeyError("Usuário não encontrado.")
-
-    usuario.nome = dados.get('nome', usuario.nome)
-    usuario.email = dados.get('email', usuario.email)
-    usuario.telefone = dados.get('telefone', usuario.telefone)
-    usuario.tipo = dados.get('tipo', usuario.tipo)
-
-    db.session.commit()
-    return usuario.to_dict()
+class EditarUserService:
+    def executar(self, id_user: int, dados: dict):
+        usuario = User.buscar_por_id(id_user)
+        if not usuario:
+            raise ValueError("Usuário não encontrado.")
+            
+        usuario.nome = dados.get('nome', usuario.nome)
+        usuario.email = dados.get('email', usuario.email)
+        usuario.tipo = dados.get('tipo', usuario.tipo)
+        usuario.atualizar()
+        return usuario.to_dict()
