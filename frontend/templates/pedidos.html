@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bora Obra - Gerenciamento de Pedidos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        nav { margin-bottom: 20px; }
+        nav a { margin-right: 15px; text-decoration: none; color: #28a745; font-weight: bold; }
+        .box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 750px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .full-width { grid-column: span 2; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, select, textarea, button { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        textarea { resize: vertical; height: 60px; }
+        button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/usuarios">Usuários</a>
+        <a href="/lojas">Lojas</a>
+        <a href="/produtos">Produtos</a>
+        <a href="/pedidos">Pedidos</a>
+    </nav>
+
+    <div class="box">
+        <h2>4. Criar Novo Pedido</h2>
+        <form id="form-pedido">
+            <div class="form-grid">
+                <div>
+                    <label for="pedido-usuario">Cliente / Solicitante:</label>
+                    <select id="pedido-usuario" required>
+                        <option value="">Carregando usuários...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="pedido-loja">Loja Destino:</label>
+                    <select id="pedido-loja" required>
+                        <option value="">Carregando lojas...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="pedido-tipo">Tipo do Pedido:</label>
+                    <select id="pedido-tipo" required>
+                        <option value="Venda">Venda</option>
+                        <option value="Locacao">Locação</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="pedido-valor">Valor Total (R$):</label>
+                    <input type="number" step="0.01" id="pedido-valor" required placeholder="0.00">
+                </div>
+
+                <div class="full-width">
+                    <label for="pedido-observacao">Observações do Pedido:</label>
+                    <textarea id="pedido-observacao" placeholder="Ex: Entregar no canteiro de obras até as 14h..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit">Criar Pedido</button>
+        </form>
+
+        <hr style="margin-top: 25px;">
+
+        <h3>Pedidos Realizados:</h3>
+        <button type="button" onclick="carregarPedidos()" style="margin-bottom: 15px;">Atualizar Lista</button>
+
+        <table border="1" style="width: 100%; text-align: left; border-collapse: collapse; background: #fff;">
+            <thead>
+                <tr style="background-color: #28a745; color: white;">
+                    <th style="padding: 8px;">ID</th>
+                    <th style="padding: 8px;">Usuário ID</th>
+                    <th style="padding: 8px;">Loja ID</th>
+                    <th style="padding: 8px;">Tipo</th>
+                    <th style="padding: 8px;">Valor Total</th>
+                    <th style="padding: 8px;">Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-pedidos-body">
+                <tr>
+                    <td colspan="6" style="padding: 8px; text-align: center;">Carregando pedidos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/static/js/pedidos.js"></script>
+</body>
+</html>
