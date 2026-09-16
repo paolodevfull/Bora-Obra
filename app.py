@@ -8,12 +8,17 @@ from backend.controllers.loja_controller import loja_bp
 from backend.controllers.produto_controller import produto_bp
 from backend.controllers.pedido_controller import pedido_bp
 from backend.controllers.relatorio_controller import relatorio_bp
+from backend.controllers.auth_controller import auth_bp
 
 app = Flask(
     __name__,
     template_folder="frontend/templates",
     static_folder="frontend/static"
 )
+
+# Necessário para a sessão de login (Flask session usa cookie assinado com essa chave).
+# TODO: mover para variável de ambiente antes de ir pra produção.
+app.config["SECRET_KEY"] = "troque-essa-chave-em-producao"
 
 database = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(database, "backend/database/bora_obra.db")
@@ -28,6 +33,7 @@ app.register_blueprint(loja_bp)
 app.register_blueprint(produto_bp)
 app.register_blueprint(pedido_bp)
 app.register_blueprint(relatorio_bp)
+app.register_blueprint(auth_bp)
 
 # Rota principal para carregar o Frontend (index.html)
 @app.route('/')
