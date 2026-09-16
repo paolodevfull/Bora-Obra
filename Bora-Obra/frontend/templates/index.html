@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoraObra - Painel de Gestão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-dark">
+
+    <!-- TELA DE LOGIN / CADASTRO -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-brand-panel">
+                <i class="fa-solid fa-helmet-safety"></i>
+                <h2>BoraObra</h2>
+                <p>A ferramenta certa, na hora certa. Gerencie sua loja ou encontre o que precisa para sua obra.</p>
+            </div>
+            <div class="auth-form-panel">
+
+                <!-- LOGIN -->
+                <div id="form-login-wrapper">
+                    <p>Entre com sua conta para continuar.</p>
+                    <form id="form-login" onsubmit="realizarLogin(event)">
+                        <div class="input-group">
+                            <label>E-mail</label>
+                            <input type="email" id="login-email" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Senha</label>
+                            <input type="password" id="login-senha" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Entrar</button>
+                    </form>
+                    <p class="auth-switch">Não tem conta? <a href="#" onclick="mostrarCadastro(event)">Cadastre-se</a></p>
+                </div>
+
+                <!-- CADASTRO -->
+                <div id="form-cadastro-wrapper" class="hidden">
+                    <p>Crie sua conta no BoraObra.</p>
+                    <form id="form-cadastro" onsubmit="realizarCadastro(event)">
+                        <div class="input-group">
+                            <label>Nome completo</label>
+                            <input type="text" id="cad-nome" placeholder="Ex: João da Silva" required>
+                        </div>
+                        <div class="input-group">
+                            <label>E-mail</label>
+                            <input type="email" id="cad-email" placeholder="seu@email.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Senha</label>
+                            <input type="password" id="cad-senha" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Tipo de conta</label>
+                            <select id="cad-tipo">
+                                <option value="cliente">Cliente (quero comprar/alugar)</option>
+                                <option value="lojista">Lojista (quero gerenciar minha loja)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Criar conta</button>
+                    </form>
+                    <p class="auth-switch">Já tem conta? <a href="#" onclick="mostrarLogin(event)">Entrar</a></p>
+                </div>
+
+                <div id="auth-erro" class="auth-erro hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAINEL LOJISTA ================= -->
+    <div id="painel-lojista" class="hidden">
+        <header class="topbar">
+            <div class="topbar-brand">
+                <i class="fa-solid fa-helmet-safety"></i>
+                <span>BoraObra</span>
+            </div>
+
+            <div class="store-switcher" title="Trocar loja/depósito ativo">
+                <i class="fa-solid fa-store"></i>
+                <span id="topbar-loja-ativa">Todas as lojas</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+
+            <div class="topbar-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar produto, pedido ou cliente...">
+            </div>
+
+            <div class="topbar-right">
+                <button class="btn-secondary" title="Notificações"><i class="fa-solid fa-bell"></i></button>
+                <div class="topbar-user">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <div>
+                        <strong id="user-display-name">Operador</strong>
+                        <div><small>Online</small></div>
+                    </div>
+                    <button class="btn-secondary" onclick="logoutUsuario()" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <aside class="sidebar">
+                <nav class="sidebar-menu">
+                    <button class="menu-btn active" onclick="trocarAba('tab-dashboard', this)">
+                        <i class="fa-solid fa-chart-pie"></i> <span>Painel</span>
+                    </button>
+                    <button class="menu-btn" onclick="trocarAba('tab-lojas', this)">
+                        <i class="fa-solid fa-store"></i> <span>Lojas</span>
+                    </button>
+                    <button class="menu-btn" onclick="trocarAba('tab-usuarios', this)">
+                        <i class="fa-solid fa-users"></i> <span>Usuários / Compradores</span>
+                    </button>
+                    <button class="menu-btn" onclick="trocarAba('tab-produtos', this)">
+                        <i class="fa-solid fa-boxes-stacked"></i> <span>Produtos</span>
+                    </button>
+                    <button class="menu-btn" onclick="trocarAba('tab-vendas', this)">
+                        <i class="fa-solid fa-receipt"></i> <span>Vendas / Pedidos</span>
+                    </button>
+                </nav>
+                <div class="sidebar-footer">
+                    <span>BoraObra v1.0</span>
+                </div>
+            </aside>
+
+            <main class="main-content">
+
+                <!-- 1. DASHBOARD -->
+                <section id="tab-dashboard" class="content-section active">
+                    <header class="section-header">
+                        <div>
+                            <h2>Visão geral do sistema</h2>
+                            <p>Resumo de vendas, locações e desempenho das suas lojas</p>
+                        </div>
+                        <button class="btn-secondary" onclick="carregarRelatorioLucro()"><i class="fa-solid fa-arrows-rotate"></i> Atualizar dados</button>
+                    </header>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card featured">
+                            <i class="fa-solid fa-wallet"></i>
+                            <div>
+                                <small>Faturamento total</small>
+                                <h3 id="dash-faturamento">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                            <div>
+                                <small>Total de pedidos</small>
+                                <h3 id="dash-pedidos">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card highlight">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <div>
+                                <small>Lucro estimado (35%)</small>
+                                <h3 id="dash-lucro">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-columns">
+                        <div class="table-card">
+                            <h3>Últimos pedidos</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tipo</th>
+                                        <th>Valor total</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl-pedidos-dash">
+                                    <tr><td colspan="5" class="empty-state">Os pedidos recentes aparecerão aqui.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="alert-panel">
+                            <h3>Central de atenção</h3>
+                            <div class="empty-state">
+                                <i class="fa-solid fa-check" style="color: var(--green); font-size: 18px; margin-bottom: 6px; display:block;"></i>
+                                Nenhum alerta no momento.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. LOJAS -->
+                <section id="tab-lojas" class="content-section">
+                    <header class="section-header">
+                        <div>
+                            <h2>Gestão de lojas e unidades</h2>
+                            <p>Cadastre e acompanhe os depósitos vinculados à sua conta</p>
+                        </div>
+                    </header>
+                    <div class="grid-2col">
+                        <div class="form-card">
+                            <h3>Cadastrar nova loja</h3>
+                            <form id="form-cad-loja" onsubmit="cadastrarLoja(event)">
+                                <div class="input-group">
+                                    <label>Nome da loja / depósito</label>
+                                    <input type="text" id="loja-nome" required placeholder="Ex: BoraObra Centro">
+                                </div>
+                                <div class="input-group">
+                                    <label>Endereço completo</label>
+                                    <input type="text" id="loja-endereco" required placeholder="Av. Principal, 1000">
+                                </div>
+                                <div class="input-group">
+                                    <label>Telefone / WhatsApp</label>
+                                    <input type="text" id="loja-telefone" placeholder="(31) 99999-9999">
+                                </div>
+                                <button type="submit" class="btn-primary">Salvar loja</button>
+                            </form>
+                        </div>
+                        <div class="table-card">
+                            <h3>Lojas cadastradas</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>Endereço</th>
+                                        <th>Telefone</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl-lojas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. USUÁRIOS / COMPRADORES -->
+                <section id="tab-usuarios" class="content-section">
+                    <header class="section-header">
+                        <div>
+                            <h2>Gestão de usuários e compradores</h2>
+                            <p>Clientes, lojistas e entregadores cadastrados no sistema</p>
+                        </div>
+                    </header>
+                    <div class="grid-2col">
+                        <div class="form-card">
+                            <h3>Cadastrar novo usuário</h3>
+                            <form id="form-cad-user" onsubmit="cadastrarUsuarioPainel(event)">
+                                <div class="input-group">
+                                    <label>Nome completo</label>
+                                    <input type="text" id="user-nome" required placeholder="Ex: João da Silva">
+                                </div>
+                                <div class="input-group">
+                                    <label>E-mail</label>
+                                    <input type="email" id="user-email" required placeholder="joao@email.com">
+                                </div>
+                                <div class="input-group">
+                                    <label>Senha provisória</label>
+                                    <input type="password" id="user-senha" required minlength="6" placeholder="Mínimo 6 caracteres">
+                                </div>
+                                <div class="input-group">
+                                    <label>Tipo de conta</label>
+                                    <select id="user-tipo">
+                                        <option value="cliente">Cliente (comprador)</option>
+                                        <option value="lojista">Lojista</option>
+                                        <option value="entregador">Entregador</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn-primary">Cadastrar usuário</button>
+                            </form>
+                        </div>
+                        <div class="table-card">
+                            <h3>Usuários cadastrados</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>E-mail</th>
+                                        <th>Tipo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl-usuarios"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. PRODUTOS -->
+                <section id="tab-produtos" class="content-section">
+                    <header class="section-header">
+                        <div>
+                            <h2>Catálogo de produtos</h2>
+                            <p>Itens de venda e locação disponíveis no balcão</p>
+                        </div>
+                    </header>
+                    <div class="grid-2col">
+                        <div class="form-card">
+                            <h3>Cadastrar produto</h3>
+                            <form id="form-cad-prod" onsubmit="cadastrarProduto(event)">
+                                <div class="input-group">
+                                    <label>Loja responsável</label>
+                                    <select id="prod-loja-select" required>
+                                        <option value="">Carregando lojas...</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Nome do produto</label>
+                                    <input type="text" id="prod-nome" placeholder="Ex: Betoneira 400L" required>
+                                </div>
+                                <div class="grid-inputs">
+                                    <div class="input-group">
+                                        <label>Categoria</label>
+                                        <input type="text" id="prod-categoria" placeholder="Maquinário">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Utilidade / etapa</label>
+                                        <input type="text" id="prod-utilidade" placeholder="Concretagem">
+                                    </div>
+                                </div>
+                                <div class="grid-inputs">
+                                    <div class="input-group">
+                                        <label>Preço venda (R$)</label>
+                                        <input type="number" step="0.01" id="prod-preco-venda" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Preço locação (R$)</label>
+                                        <input type="number" step="0.01" id="prod-preco-locacao" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary">Salvar produto</button>
+                            </form>
+                        </div>
+                        <div class="table-card">
+                            <h3>Produtos cadastrados</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>Utilidade</th>
+                                        <th>Valores (venda / locação)</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl-produtos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. VENDAS / PEDIDOS — SOMENTE LEITURA PARA O LOJISTA -->
+                <section id="tab-vendas" class="content-section">
+                    <header class="section-header">
+                        <div>
+                            <h2>Pedidos recebidos</h2>
+                            <p>Acompanhe as vendas e locações feitas pelos clientes — apenas visualização</p>
+                        </div>
+                        <button class="btn-secondary" onclick="carregarPedidos()"><i class="fa-solid fa-arrows-rotate"></i> Atualizar</button>
+                    </header>
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Tipo</th>
+                                    <th>Valor total</th>
+                                    <th>Endereço de entrega</th>
+                                    <th>Status</th>
+                                    <th>Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-pedidos">
+                                <tr><td colspan="7" class="empty-state">Carregando pedidos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= PAINEL CLIENTE ================= -->
+    <div id="painel-cliente" class="hidden">
+        <header class="topbar">
+            <div class="topbar-brand">
+                <i class="fa-solid fa-helmet-safety"></i>
+                <span>BoraObra</span>
+            </div>
+
+            <div class="topbar-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="cliente-busca-loja" placeholder="Buscar loja pelo nome..." oninput="filtrarLojasCliente()">
+            </div>
+
+            <div class="topbar-right">
+                <div class="topbar-user">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <div>
+                        <strong id="cliente-nome-display">Cliente</strong>
+                        <div><small>Online</small></div>
+                    </div>
+                    <button class="btn-secondary" onclick="logoutUsuario()" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content" style="max-width: 1200px; margin: 0 auto;">
+
+            <div class="cliente-tabs">
+                <button class="menu-btn-inline active" id="btn-cliente-tab-lojas" onclick="trocarAbaCliente('cliente-tab-lojas', this)">
+                    <i class="fa-solid fa-store"></i> Lojas
+                </button>
+                <button class="menu-btn-inline" id="btn-cliente-tab-pedidos" onclick="trocarAbaCliente('cliente-tab-pedidos', this)">
+                    <i class="fa-solid fa-receipt"></i> Meus pedidos
+                </button>
+            </div>
+
+            <!-- ABA: LOJAS + CATÁLOGO -->
+            <section id="cliente-tab-lojas" class="cliente-section active">
+                <header class="section-header">
+                    <div>
+                        <h2>Lojas disponíveis</h2>
+                        <p>Encontre a loja certa e veja o catálogo de ferramentas e materiais</p>
+                    </div>
+                </header>
+
+                <div id="cliente-lojas-grid" class="lojas-grid">
+                    <p class="empty-state">Carregando lojas...</p>
+                </div>
+
+                <!-- Catálogo da loja selecionada -->
+                <div id="cliente-catalogo" class="hidden">
+                    <button class="btn-secondary" onclick="voltarParaLojas()"><i class="fa-solid fa-arrow-left"></i> Voltar às lojas</button>
+
+                    <header class="section-header" style="margin-top: 20px;">
+                        <div>
+                            <h2 id="cliente-catalogo-loja-nome">Loja</h2>
+                            <p id="cliente-catalogo-loja-endereco"></p>
+                        </div>
+                        <div class="tipo-compra-switch">
+                            <button type="button" class="tipo-btn active" id="btn-tipo-venda" onclick="definirTipoCompra('Venda')">Comprar</button>
+                            <button type="button" class="tipo-btn" id="btn-tipo-locacao" onclick="definirTipoCompra('Locacao')">Alugar</button>
+                        </div>
+                    </header>
+
+                    <div class="catalogo-grid">
+                        <div id="cliente-catalogo-produtos" class="produtos-grid"></div>
+
+                        <div class="carrinho-panel">
+                            <h3><i class="fa-solid fa-cart-shopping"></i> Seu pedido</h3>
+                            <div id="carrinho-itens">
+                                <p class="empty-state">Nenhum item adicionado ainda.</p>
+                            </div>
+                            <div class="pedido-total-display">
+                                <span>Total</span>
+                                <strong id="carrinho-total-display">R$ 0,00</strong>
+                            </div>
+                            <div class="input-group">
+                                <label>Endereço de entrega</label>
+                                <input type="text" id="carrinho-endereco" placeholder="Rua, número, bairro...">
+                            </div>
+                            <div class="input-group">
+                                <label>Forma de pagamento</label>
+                                <select id="carrinho-forma-pagamento">
+                                    <option value="Pix">Pix</option>
+                                    <option value="Cartão de crédito">Cartão de crédito</option>
+                                    <option value="Cartão de débito">Cartão de débito</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary" onclick="finalizarPedidoCliente()">Confirmar pedido</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA: MEUS PEDIDOS -->
+            <section id="cliente-tab-pedidos" class="cliente-section">
+                <header class="section-header">
+                    <div>
+                        <h2>Meus pedidos</h2>
+                        <p>Acompanhe o status das suas compras e locações</p>
+                    </div>
+                    <button class="btn-secondary" onclick="carregarMeusPedidos()"><i class="fa-solid fa-arrows-rotate"></i> Atualizar</button>
+                </header>
+                <div class="table-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Valor total</th>
+                                <th>Endereço de entrega</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-meus-pedidos">
+                            <tr><td colspan="6" class="empty-state">Você ainda não fez nenhum pedido.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ================= PAINEL ENTREGADOR (placeholder) ================= -->
+    <div id="painel-entregador" class="hidden">
+        <div class="placeholder-screen">
+            <i class="fa-solid fa-truck-fast"></i>
+            <h2>Área do entregador em breve</h2>
+            <p>Estamos preparando essa experiência para você. Volte em breve!</p>
+            <button class="btn-secondary" onclick="logoutUsuario()">Sair</button>
+        </div>
+    </div>
+
+    <!-- MODAL TICKET TÉRMICO -->
+    <div id="ticket-modal" class="modal-overlay hidden">
+        <div class="ticket-card">
+            <pre id="ticket-content"></pre>
+            <button class="btn-secondary" onclick="fecharTicket()">Fechar ticket</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
