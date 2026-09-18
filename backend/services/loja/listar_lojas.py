@@ -1,14 +1,4 @@
-from backend.models.loja import Loja  # Ajuste o import conforme o local do seu Model
-
+from backend.repositories.loja_repository import LojaRepository
 class ListarLojasService:
-    def executar(self):
-        try:
-            lojas = Loja.query.all()
-            return [{
-                'id': l.id,
-                'nome': l.nome,
-                'endereco': l.endereco,
-                'telefone': l.telefone
-            } for l in lojas]
-        except Exception as e:
-            raise Exception(f"Erro ao buscar lojas no banco: {str(e)}")
+    def executar(self, lojista_id=None):
+        return [loja.to_dict() for loja in LojaRepository.listar(**({'lojista_id': lojista_id} if lojista_id else {}))]

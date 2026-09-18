@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-from . import db
+from backend.database.database import db
 
 class ModeloBase(db.Model):
 

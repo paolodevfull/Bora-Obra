@@ -1,30 +1,23 @@
-from backend.database import db  # Ajuste o import do banco conforme seu projeto
+from backend.repositories.loja_repository import LojaRepository
+from backend.services.acesso import AcessoService
+from backend.services.validation import texto
 from backend.models.loja import Loja
+from backend.services.errors import ServiceError
+from backend.services.geocoding import geocodificar_endereco
+
 
 class CriarLojaService:
-    def executar(self, dados):
-        nome = dados.get('nome', '').strip()
-        endereco = dados.get('endereco', '').strip()
-        telefone = dados.get('telefone', '').strip()
+    def executar(self, dados, lojista_id):
+        AcessoService().usuario(lojista_id, {'lojista'})
+        nome = texto(dados.get('nome'), 'Nome', 3, 100)
+        endereco = texto(dados.get('endereco'), 'Endereço', 5, 200)
+        telefone = (dados.get('telefone') or '').strip()
 
-        # Validações de entrada
-        if not nome or len(nome) < 3:
-            raise ValueError("O nome da loja deve conter pelo menos 3 caracteres.")
-        if not endereco or len(endereco) < 5:
-            raise ValueError("O endereço da loja deve ser informado corretamente.")
+        if LojaRepository.buscar_por_lojista(lojista_id):
+            raise ServiceError("Este lojista já possui uma loja cadastrada.")
 
-        nova_loja = Loja(
-            nome=nome,
-            endereco=endereco,
-            telefone=telefone
-        )
-        
-        db.session.add(nova_loja)
-        db.session.commit()
-
-        return {
-            'id': nova_loja.id,
-            'nome': nova_loja.nome,
-            'endereco': nova_loja.endereco,
-            'telefone': nova_loja.telefone
-        }
+        latitude, longitude = geocodificar_endereco(endereco)
+        loja = Loja(nome=nome, endereco=endereco, telefone=telefone, lojista_id=lojista_id,
+                    latitude=latitude, longitude=longitude)
+        LojaRepository.salvar(loja)
+        return loja.to_dict()

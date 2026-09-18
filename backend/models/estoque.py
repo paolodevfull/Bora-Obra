@@ -1,5 +1,5 @@
-from . import db
-from .base_model import ModeloBase
+from backend.database.database import db
+from backend.models.base_model import ModeloBase
 
 class Estoque(ModeloBase):
     __tablename__ = 'estoques'

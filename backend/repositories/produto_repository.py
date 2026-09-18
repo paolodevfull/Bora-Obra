@@ -1,6 +1,9 @@
 from backend.models.produto import Produto
 
-class ProdutoRepository:
+from backend.repositories.base_repository import BaseRepository
+
+class ProdutoRepository(BaseRepository):
+    model = Produto
 
     @staticmethod
     def buscar_por_utilidade_e_categoria(utilidade=None, categoria=None, disponivel_apenas=True):

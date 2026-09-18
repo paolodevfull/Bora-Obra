@@ -1,33 +1,22 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, session
+from backend.controllers.http import endpoint, json_body
+from backend.services.acesso import AcessoService
 from backend.services.loja.criar_loja import CriarLojaService
 from backend.services.loja.listar_lojas import ListarLojasService
-
+from backend.services.loja.editar_loja import EditarLojaService
+from backend.services.loja.consultar_lojas import ConsultarLojasService
 loja_bp = Blueprint('loja_bp', __name__, url_prefix='/api/lojas')
-
-class LojaController:
-
-    @staticmethod
-    @loja_bp.route('', methods=['POST'])
-    def criar():
-        try:
-            dados = request.get_json()
-            if not dados:
-                return jsonify({'erro': 'Corpo da requisição inválido ou vazio.'}), 400
-
-            service = CriarLojaService()
-            loja = service.executar(dados)
-            return jsonify(loja), 201
-        except ValueError as e:
-            return jsonify({'erro': str(e)}), 400
-        except Exception as e:
-            return jsonify({'erro': f'Erro interno no servidor: {str(e)}'}), 500
-
-    @staticmethod
-    @loja_bp.route('', methods=['GET'])
-    def listar():
-        try:
-            service = ListarLojasService()
-            lojas = service.executar()
-            return jsonify(lojas), 200
-        except Exception as e:
-            return jsonify({'erro': str(e)}), 500
+@loja_bp.route('', methods=['POST'])
+@endpoint
+def criar():
+    user = AcessoService().usuario(session.get('user_id'), {'lojista'})
+    return jsonify(CriarLojaService().executar(json_body(),user.id)),201
+@loja_bp.route('', methods=['GET'])
+@endpoint
+def listar():
+    return jsonify(ConsultarLojasService().executar(session.get('user_id')))
+@loja_bp.route('/<int:id>', methods=['PUT','PATCH'])
+@endpoint
+def editar(id):
+    user = AcessoService().usuario(session.get('user_id'), {'lojista'})
+    return jsonify(EditarLojaService().executar(id,user.id,json_body()))

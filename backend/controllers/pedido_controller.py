@@ -1,43 +1,32 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, jsonify, session
+from backend.controllers.http import endpoint, json_body
+from backend.services.acesso import AcessoService
 from backend.services.pedido.criar_pedido import CriarPedidoService
-from backend.services.pedido.listar_pedidos import ListarPedidosService
+from backend.services.pedido.consultar_pedidos import ConsultarPedidosService
 from backend.services.pedido.gerar_ticket_pedido import GerarTicketPedidoService
-
+from backend.services.pedido.confirmar_entrega_pedido import ConfirmarEntregaPedidoService
+from backend.services.pedido.atualizar_status import AtualizarStatusPedidoService
 pedido_bp = Blueprint('pedido_bp', __name__, url_prefix='/api/pedidos')
+@pedido_bp.route('', methods=['POST'])
+@endpoint
+def criar():
+    user = AcessoService().usuario(session.get('user_id'), {'cliente'})
+    return jsonify(CriarPedidoService().executar({**json_body(), 'user_id':user.id})),201
+@pedido_bp.route('', methods=['GET'])
+@endpoint
+def listar():
+    return jsonify(ConsultarPedidosService().executar(session.get('user_id')))
+@pedido_bp.route('/<int:id>/ticket', methods=['GET'])
+@endpoint
+def ticket(id):
+    return jsonify(GerarTicketPedidoService().executar(id,session.get('user_id')))
+@pedido_bp.route('/<int:id>/confirmar-entrega', methods=['PATCH'])
+@endpoint
+def confirmar(id):
+    user = AcessoService().usuario(session.get('user_id'), {'cliente'})
+    return jsonify(ConfirmarEntregaPedidoService().executar(id,user.id))
 
-
-class PedidoController:
-
-    @staticmethod
-    @pedido_bp.route('', methods=['POST'])
-    def criar():
-        # Lojista não cria pedido — apenas o cliente, a partir do catálogo.
-        if session.get('user_tipo') == 'lojista':
-            return jsonify({'erro': 'Lojistas não podem criar pedidos.'}), 403
-
-        try:
-            dados = request.get_json()
-            service = CriarPedidoService()
-            pedido = service.executar(dados)
-            return jsonify(pedido), 201
-        except ValueError as e:
-            return jsonify({'erro': str(e)}), 400
-
-    @staticmethod
-    @pedido_bp.route('', methods=['GET'])
-    def listar():
-        # ?user_id=<id> filtra "meus pedidos" (usado pela tela do cliente).
-        # Sem o parâmetro, retorna todos (usado pela tela do lojista).
-        user_id = request.args.get('user_id', type=int)
-        service = ListarPedidosService()
-        return jsonify(service.executar(user_id=user_id)), 200
-
-    @staticmethod
-    @pedido_bp.route('/<int:id>/ticket', methods=['GET'])
-    def gerar_ticket(id):
-        try:
-            service = GerarTicketPedidoService()
-            ticket = service.executar(id)
-            return jsonify(ticket), 200
-        except ValueError as e:
-            return jsonify({'erro': str(e)}), 404
+@pedido_bp.route('/<int:id>', methods=['PATCH'])
+@endpoint
+def atualizar_status(id):
+    return jsonify(AtualizarStatusPedidoService().executar(id, session.get('user_id'), json_body()))

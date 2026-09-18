@@ -14,6 +14,9 @@ class Pedido(db.Model):
     observacao = db.Column(db.Text)
     created_at = db.Column(db.String(50))
 
+    cliente = db.relationship('User', foreign_keys=[user_id])
+    loja = db.relationship('Loja', foreign_keys=[loja_id])
+
     itens = db.relationship(
         'ItemPedidos',
         backref='pedido',
@@ -21,31 +24,11 @@ class Pedido(db.Model):
         cascade='all, delete-orphan'
     )
 
-    def salvar(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def atualizar(self):
-        db.session.commit()
-        return self
-
-    def deletar(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    @classmethod
-    def listar_todos(cls):
-        return cls.query.all()
-
-    @classmethod
-    def buscar_por_id(cls, id_pedido):
-        return cls.query.get(id_pedido)
-
     def to_dict(self, incluir_itens=False):
         dados = {
             "id": self.id,
             "user_id": self.user_id,
+            "cliente_nome": self.cliente.nome if self.cliente else "Cliente removido",
             "loja_id": self.loja_id,
             "status": self.status,
             "tipo": self.tipo,

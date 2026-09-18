@@ -1,119 +1,70 @@
-const API_BASE = 'http://127.0.0.1:5000/api';
+import { state } from './state.js';
+import { apiRequest } from './api.js';
+import { badgeStatusClass, statusPedidoLabel, exibirNotificacao, escapeHtml, confirmarAcao } from './ui.js';
+import { formatarDataHora } from './utils.js';
+import { renderDashboardCliente } from './dashboard.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    carregarSelectUsuarios();
-    carregarSelectLojas();
-    carregarPedidos();
-
-    const formPedido = document.getElementById('form-pedido');
-    if (formPedido) {
-        formPedido.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const dados = {
-                user_id: parseInt(document.getElementById('pedido-usuario').value),
-                loja_id: parseInt(document.getElementById('pedido-loja').value),
-                tipo: document.getElementById('pedido-tipo').value,
-                valor_total: parseFloat(document.getElementById('pedido-valor').value),
-                observacao: document.getElementById('pedido-observacao').value || null
-            };
-
-            try {
-                const response = await fetch(`${API_BASE}/pedidos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-
-                const resultado = await response.json();
-
-                if (response.ok) {
-                    alert('Pedido criado com sucesso!');
-                    formPedido.reset();
-                    await carregarPedidos();
-                } else {
-                    alert('Erro ao criar pedido: ' + (resultado.erro || resultado.error || 'Erro desconhecido'));
-                }
-            } catch (err) {
-                console.error('Erro na requisição:', err);
-                alert('Erro de conexão com o servidor.');
-            }
-        });
-    }
-});
-
-// Popula o select de Usuários
-async function carregarSelectUsuarios() {
-    const selectUser = document.getElementById('pedido-usuario');
-    if (!selectUser) return;
+export async function carregarMeusPedidos() {
+    if (!state.usuarioAtual) return;
 
     try {
-        const response = await fetch(`${API_BASE}/users`);
-        const usuarios = await response.json();
+        const res = await apiRequest(`/api/pedidos?user_id=${state.usuarioAtual.id}`);
+        if (!res.ok) throw new Error("Erro ao carregar pedidos.");
+        const pedidos = await res.json();
+        state.cachePedidosCliente = pedidos;
+        document.getElementById('cliente-total-pedidos').textContent = pedidos.length;
+        document.getElementById('cliente-total-compras').textContent = pedidos.filter(p => p.tipo === 'Venda' && p.status !== 'Cancelado').length;
+        document.getElementById('cliente-locacoes-ativas').textContent = pedidos.filter(p => p.tipo === 'Locacao' && !['Entregue', 'Cancelado'].includes(p.status)).length;
+        renderDashboardCliente();
 
-        if (response.ok && usuarios.length > 0) {
-            selectUser.innerHTML = '<option value="">Selecione o usuário...</option>' +
-                usuarios.map(u => `<option value="${u.id}">${u.nome} (ID: ${u.id})</option>`).join('');
-        } else {
-            selectUser.innerHTML = '<option value="">Nenhum usuário cadastrado</option>';
+        const tbody = document.getElementById('tbl-meus-pedidos');
+        if (!tbody) return;
+
+        if (pedidos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Você ainda não fez nenhum pedido.</td></tr>';
+            return;
         }
+
+        tbody.innerHTML = pedidos.map(p => {
+            const jaEntregue = p.status === 'Entregue';
+            const cancelado = p.status === 'Cancelado';
+            const acao = (jaEntregue || cancelado)
+                ? '-'
+                : `<button class="btn-secondary" type="button" data-action="pedido-entregue" data-id="${p.id}">
+                        <i class="fa-solid fa-check"></i> Marcar como entregue
+                   </button>`;
+
+            return `
+            <tr>
+                <td>#${p.id}</td>
+                <td>${p.tipo}</td>
+                <td>R$ ${p.valor_total.toFixed(2)}</td>
+                <td>${escapeHtml(p.endereco_entrega || 'Retirada na loja')}</td>
+                <td><span class="badge ${escapeHtml(badgeStatusClass(p.status))}">${escapeHtml(statusPedidoLabel(p.status, p.tipo))}</span></td>
+                <td>${escapeHtml(formatarDataHora(p.created_at))}</td>
+                <td>${acao} <button class="btn-secondary" type="button" data-action="pedido-ticket" data-id="${p.id}">Ticket</button></td>
+            </tr>
+        `;
+        }).join('');
     } catch (err) {
-        console.error('Erro ao carregar usuários:', err);
-        selectUser.innerHTML = '<option value="">Erro ao carregar usuários</option>';
+        exibirNotificacao(err.message || "Não foi possível carregar os dados.", true);
     }
 }
 
-// Popula o select de Lojas
-async function carregarSelectLojas() {
-    const selectLoja = document.getElementById('pedido-loja');
-    if (!selectLoja) return;
+export async function confirmarEntregaPedido(id) {
+    if (!await confirmarAcao('Confirma que recebeu este pedido?', 'Confirmar entrega?')) return;
 
     try {
-        const response = await fetch(`${API_BASE}/lojas`);
-        const lojas = await response.json();
+        const res = await apiRequest(`/api/pedidos/${id}/confirmar-entrega`, { method: 'PATCH' });
+        const resposta = await res.json();
 
-        if (response.ok && lojas.length > 0) {
-            selectLoja.innerHTML = '<option value="">Selecione a loja...</option>' +
-                lojas.map(l => `<option value="${l.id}">${l.nome} (ID: ${l.id})</option>`).join('');
-        } else {
-            selectLoja.innerHTML = '<option value="">Nenhuma loja cadastrada</option>';
+        if (!res.ok) {
+            throw new Error(resposta.erro || "Não foi possível confirmar a entrega.");
         }
+
+        exibirNotificacao("Pedido marcado como entregue!");
+        carregarMeusPedidos();
     } catch (err) {
-        console.error('Erro ao carregar lojas:', err);
-        selectLoja.innerHTML = '<option value="">Erro ao carregar lojas</option>';
-    }
-}
-
-// Busca e renderiza os pedidos na tabela
-async function carregarPedidos() {
-    const tbody = document.getElementById('tabela-pedidos-body');
-    if (!tbody) return;
-
-    try {
-        const response = await fetch(`${API_BASE}/pedidos`);
-        const pedidos = await response.json();
-
-        if (response.ok) {
-            if (pedidos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 8px;">Nenhum pedido realizado.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = pedidos.map(ped => `
-                <tr>
-                    <td style="padding: 8px;">${ped.id}</td>
-                    <td style="padding: 8px;">${ped.user_id}</td>
-                    <td style="padding: 8px;">${ped.loja_id}</td>
-                    <td style="padding: 8px;">${ped.tipo}</td>
-                    <td style="padding: 8px;">R$ ${Number(ped.valor_total).toFixed(2)}</td>
-                    <td style="padding: 8px;">${ped.status || 'Pendente'}</td>
-                </tr>
-            `).join('');
-        } else {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red; padding: 8px;">Erro ao buscar pedidos.</td></tr>';
-        }
-    } catch (err) {
-        console.error('Erro ao carregar pedidos:', err);
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red; padding: 8px;">Erro ao conectar com a API.</td></tr>';
+        exibirNotificacao(err.message, true);
     }
 }

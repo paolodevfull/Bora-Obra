@@ -1,11 +1,13 @@
+from backend.repositories.produto_repository import ProdutoRepository
 from backend.models.produto import Produto
+from backend.services.errors import ServiceError
 
 class AlternarDisponibilidadeService:
     def executar(self, id_produto: int):
-        produto = Produto.buscar_por_id(id_produto)
+        produto = ProdutoRepository.buscar_por_id(id_produto)
         if not produto:
-            raise ValueError("Produto não encontrado.")
+            raise ServiceError("Produto não encontrado.", 404)
             
         produto.disponivel = not produto.disponivel
-        produto.atualizar()
+        ProdutoRepository.atualizar(produto)
         return produto.to_dict()

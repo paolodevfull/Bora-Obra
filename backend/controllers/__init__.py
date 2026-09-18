@@ -1,9 +1,9 @@
-from .index_controller import index_bp
-from .loja_controller import loja_bp
-from .pedido_controller import pedido_bp
-from .produto_controller import produto_bp
-from .user_controller import user_bp
-from .auth_controller import auth_bp
+from backend.controllers.index_controller import index_bp
+from backend.controllers.loja_controller import loja_bp
+from backend.controllers.pedido_controller import pedido_bp
+from backend.controllers.produto_controller import produto_bp
+from backend.controllers.user_controller import user_bp
+from backend.controllers.auth_controller import auth_bp
+from backend.controllers.relatorio_controller import relatorio_bp
 
-
-__all__ = ["index_bp", "loja_bp", "pedido_bp", "user_bp", "produto_bp", "auth_bp"]
+__all__ = ["index_bp", "loja_bp", "pedido_bp", "user_bp", "produto_bp", "auth_bp", "relatorio_bp"]

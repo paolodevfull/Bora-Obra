@@ -1,14 +1,11 @@
-from backend.database.database import db
-from backend.models.estoque import Estoque
-
-def editar_estoque_service(estoque_id: int, dados: dict) -> dict:
-    estoque = Estoque.query.get(estoque_id)
-    if not estoque:
-        raise KeyError("Registro de estoque não encontrado.")
-
-    estoque.quantidade = dados.get('quantidade', estoque.quantidade)
-    estoque.localizacao_fisica = dados.get('localizacao_fisica', estoque.localizacao_fisica)
-    estoque.status = dados.get('status', estoque.status)
-
-    db.session.commit()
-    return estoque.to_dict()
+from backend.repositories.estoque_repository import EstoqueRepository
+from backend.services.validation import inteiro, texto
+from backend.services.errors import ServiceError
+class EditarEstoqueService:
+    def executar(self, estoque_id, dados):
+        estoque = EstoqueRepository.buscar_por_id(estoque_id)
+        if not estoque: raise ServiceError('Estoque não encontrado.',404)
+        quantidade = inteiro(dados.get('quantidade',estoque.quantidade),'Quantidade',0)
+        localizacao = texto(dados.get('localizacao_fisica',estoque.localizacao_fisica) or 'Não informada','Localização',maximum=100)
+        estoque.quantidade, estoque.localizacao_fisica = quantidade, localizacao
+        return EstoqueRepository.atualizar(estoque).to_dict()

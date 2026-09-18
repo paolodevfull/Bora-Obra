@@ -12,26 +12,12 @@ class Produto(db.Model):
     preco_locacao = db.Column(db.Float, default=0.0)
     disponivel = db.Column(db.Boolean, default=True) # REQ 14 - Toggle Ligar/Desligar
 
-    def salvar(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def atualizar(self):
-        db.session.commit()
-        return self
-
-    def deletar(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    @classmethod
-    def listar_todos(cls):
-        return cls.query.all()
-
-    @classmethod
-    def buscar_por_id(cls, id_produto):
-        return cls.query.get(id_produto)
+    disponivel_venda = db.Column(db.Boolean, nullable=False, default=True)
+    disponivel_locacao = db.Column(db.Boolean, nullable=False, default=True)
+    status_manutencao = db.Column(db.Boolean, nullable=False, default=False)
+    classificacao_curva_a = db.Column(db.Boolean, nullable=False, default=False)
+    descricao = db.Column(db.Text)
+    cor_tamanho = db.Column(db.String(100))
 
     def to_dict(self):
         return {
@@ -42,5 +28,11 @@ class Produto(db.Model):
             "utilidade": self.utilidade,
             "preco_venda": self.preco_venda,
             "preco_locacao": self.preco_locacao,
-            "disponivel": self.disponivel
+            "disponivel": self.disponivel,
+            "disponivel_venda": self.disponivel_venda,
+            "disponivel_locacao": self.disponivel_locacao,
+            "status_manutencao": self.status_manutencao,
+            "classificacao_curva_a": self.classificacao_curva_a,
+            "descricao": self.descricao,
+            "cor_tamanho": self.cor_tamanho
         }

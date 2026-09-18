@@ -1,25 +1,23 @@
-const API_BASE = 'http://127.0.0.1:5000/api';
-
-async function apiFetch(endpoint, options = {}) {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-        ...options,
-    };
-
+// Same-origin API client shared by all feature modules.
+export async function apiRequest(endpoint, options = {}, accepted = []) {
+    let response;
     try {
-        const response = await fetch(`${API_BASE}${endpoint}`, config);
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.erro || data.error || 'Erro na requisição');
-        }
-
-        return data;
-    } catch (err) {
-        console.error(`[API Error] ${endpoint}:`, err.message);
-        throw err;
+        response = await fetch(endpoint, {
+            ...options,
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/json', Accept: 'application/json', ...options.headers}
+        });
+    } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        throw new Error('Sem conexão com o servidor. Verifique sua conexão e tente novamente.');
     }
+    if (!response.ok && !accepted.includes(response.status)) {
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await response.clone().json().catch(() => ({})) : {};
+        const error = new Error(data.mensagem || data.message || data.erro || `Não foi possível concluir a operação (${response.status}).`);
+        error.status = response.status;
+        if (response.status === 401) window.dispatchEvent(new CustomEvent('boraobra:session-expired'));
+        throw error;
+    }
+    return response;
 }

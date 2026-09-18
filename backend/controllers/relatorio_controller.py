@@ -1,16 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, session
+from backend.controllers.http import endpoint
 from backend.services.relatorio.gerar_relatorio_lucro import GerarRelatorioLucroService
-
-relatorio_bp = Blueprint('relatorio_bp', __name__, url_prefix='/api/relatorios')
-
-class RelatorioController:
-
-    @staticmethod
-    @relatorio_bp.route('/lucro-diario', methods=['GET'])
-    def obter_relatorio_lucro():
-        try:
-            service = GerarRelatorioLucroService()
-            relatorio = service.executar()
-            return jsonify(relatorio), 200
-        except Exception as e:
-            return jsonify({'erro': str(e)}), 500
+relatorio_bp = Blueprint('relatorio_bp',__name__,url_prefix='/api/relatorios')
+@relatorio_bp.route('/lucro-diario', methods=['GET'])
+@endpoint
+def diario():
+    return jsonify(GerarRelatorioLucroService().executar(session.get('user_id')))

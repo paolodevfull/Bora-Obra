@@ -1,12 +1,12 @@
 from backend.database.database import db
 
-from .base_model import ModeloBase
-from .estoque import Estoque
-from .item_pedidos import ItemPedidos
-from .loja import Loja
-from .pedido import Pedido
-from .produto import Produto
-from .user import User
+from backend.models.base_model import ModeloBase
+from backend.models.estoque import Estoque
+from backend.models.item_pedidos import ItemPedidos
+from backend.models.loja import Loja
+from backend.models.pedido import Pedido
+from backend.models.produto import Produto
+from backend.models.user import User
 
 __all__ = [
     "db",
@@ -18,3 +18,4 @@ __all__ = [
     "Produto",
     "User",
 ]
+from backend.models.entrega import Entrega
