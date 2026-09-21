@@ -120,6 +120,34 @@ class FluxoTest(unittest.TestCase):
         self.call(staff,'patch',f"/api/produtos/{self.produto['id']}/toggle-disponibilidade")
         self.assertEqual(len(self.call(staff,'get','/api/produtos')),1)
 
+    def test_structured_addresses_and_account_name_login(self):
+        account=self.app.test_client()
+        created=self.call(account,'post','/api/users',{
+            'nome':'Maria da Obra','email':'maria@example.com','senha':'Teste123!','tipo':'cliente',
+            'cep':'30140-110','logradouro':'Avenida Brasil','numero':'500','complemento':'Apto 2',
+            'bairro':'Centro','cidade':'Belo Horizonte','uf':'mg'
+        },201)
+        self.assertEqual(created['uf'],'MG')
+        self.assertIn('CEP 30140-110',created['endereco'])
+        self.call(account,'post','/api/auth/login',{'nome':'Nome incorreto','email':'maria@example.com','senha':'Teste123!'},401)
+        self.call(account,'post','/api/auth/login',{'nome':'Maria da Obra','email':'maria@example.com','senha':'Teste123!'})
+
+        owner=self.app.test_client(); self.register(owner,'endereco-loja@example.com','lojista')
+        loja=self.call(owner,'post','/api/lojas',{
+            'nome':'Loja Completa','telefone':'(31) 99999-9999','cep':'30140-110',
+            'logradouro':'Avenida Brasil','numero':'900','bairro':'Centro',
+            'cidade':'Belo Horizonte','uf':'mg'
+        },201)
+        self.assertEqual(loja['uf'],'MG')
+        self.assertEqual(loja['numero'],'900')
+        self.assertIn('Belo Horizonte - MG',loja['endereco'])
+
+    def test_invalid_structured_address(self):
+        account=self.app.test_client()
+        self.call(account,'post','/api/users',{'nome':'CEP inválido','email':'cep@example.com','senha':'Teste123!','tipo':'cliente','cep':'123'},400)
+        owner=self.app.test_client(); self.register(owner,'loja-invalida@example.com','lojista')
+        self.call(owner,'post','/api/lojas',{'nome':'Loja sem número','cep':'30140-110','logradouro':'Rua A','bairro':'Centro','cidade':'BH','uf':'MG'},400)
+
 
 class InfrastructureTest(unittest.TestCase):
     def test_frontend_is_modular_and_has_no_inline_handlers(self):

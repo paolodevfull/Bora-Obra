@@ -491,6 +491,23 @@ h1, h2, h3, .metric-card h3, .brand span {
 }
 .grid-inputs > *, .form-card form, .form-card fieldset { min-width: 0; max-width: 100%; }
 .form-card { min-width: 0; overflow: hidden; }
+.address-fieldset { margin: 4px 0 18px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.address-fieldset legend { padding: 0 7px; color: var(--text); font-size: 13px; font-weight: 600; }
+.address-fieldset legend small { color: var(--text-muted); font-weight: 400; }
+.address-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0 12px; }
+.address-grid .input-group { grid-column: span 2; }
+.address-grid .street-field { grid-column: span 4; }
+.address-grid .cep-field { grid-column: span 2; }
+.address-grid .uf-field { grid-column: span 1; }
+.input-group.compact { margin-bottom: 12px; }
+.field-help { display: flex; align-items: center; gap: 7px; color: var(--text-muted); line-height: 1.45; }
+.field-help i { color: var(--orange); }
+.cep-status { min-height: 16px; color: var(--text-muted); font-size: 11px; line-height: 1.35; }
+.cep-status[data-tipo="carregando"] { color: var(--warning); }
+.cep-status[data-tipo="sucesso"] { color: #62c99f; }
+.cep-status[data-tipo="erro"] { color: #ee8f8f; }
+input[aria-busy="true"] { background-image: linear-gradient(90deg, transparent, rgba(255,255,255,.05), transparent); background-size: 200% 100%; animation: cep-loading 1s linear infinite; }
+@keyframes cep-loading { to { background-position: -200% 0; } }
 
 .btn-primary {
     width: 100%;
@@ -590,12 +607,13 @@ h1, h2, h3, .metric-card h3, .brand span {
 
 .auth-card {
     display: flex;
-    width: 760px;
+    width: 900px;
     max-width: 92vw;
     background-color: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     overflow: hidden;
+    max-height: calc(100vh - 32px);
 }
 
 .auth-brand-panel {
@@ -637,6 +655,7 @@ h1, h2, h3, .metric-card h3, .brand span {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow-y: auto;
 }
 
 .auth-form-panel > p {
@@ -1144,6 +1163,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .ticket-card { max-height: 90vh; overflow: auto; max-width: calc(100vw - 24px); }
 #ticket-content { width: var(--ticket-width); max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; background: white; color: black; padding: 4mm; font: 12px/1.5 'Courier New', monospace; }
 @media (max-width: 650px) {
+    .address-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .address-grid .input-group, .address-grid .street-field, .address-grid .cep-field { grid-column: 1 / -1; }
+    .address-grid .uf-field { grid-column: span 1; }
     .availability-fields { grid-template-columns: 1fr; }
     .section-header { flex-wrap: wrap; gap: 14px; }
     .table-scroll { overflow-x: auto; }

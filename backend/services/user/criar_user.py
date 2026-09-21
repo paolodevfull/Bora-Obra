@@ -2,6 +2,7 @@ from backend.services.validation import texto
 from backend.repositories.user_repository import UserRepository
 from backend.models.user import User
 from backend.services.errors import ServiceError
+from backend.services.endereco import normalizar_endereco, CAMPOS_ENDERECO
 
 
 class CriarUserService:
@@ -18,11 +19,14 @@ class CriarUserService:
         if UserRepository.buscar_por_email(email):
             raise ServiceError("Já existe uma conta cadastrada com esse e-mail.")
 
+        endereco = normalizar_endereco(dados)
         usuario = User(
             nome=nome,
             email=email,
             tipo=tipo,
-            responsavel_id=dados.get('responsavel_id')
+            responsavel_id=dados.get('responsavel_id'),
+            endereco=endereco['endereco'],
+            **{campo: endereco[campo] for campo in CAMPOS_ENDERECO}
         )
         usuario.set_senha(senha)
         UserRepository.salvar(usuario)

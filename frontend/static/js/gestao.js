@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { apiRequest } from './api.js';
 import { badgeStatusClass, statusPedidoLabel, exibirNotificacao, escapeHtml, trocarAba, confirmarAcao } from './ui.js';
 import { renderDashboardLojista } from './dashboard.js';
-import { formatarDataHora } from './utils.js';
+import { formatarDataHora, obterEndereco, preencherEndereco } from './utils.js';
 
 export async function carregarRelatorioLucro() {
     try {
@@ -47,8 +47,8 @@ export async function cadastrarLoja(e) {
     e.preventDefault();
     const dados = {
         nome: document.getElementById('loja-nome').value,
-        endereco: document.getElementById('loja-endereco').value,
-        telefone: document.getElementById('loja-telefone').value
+        telefone: document.getElementById('loja-telefone').value,
+        ...obterEndereco('loja')
     };
 
     try {
@@ -89,7 +89,7 @@ export function renderizarAreaDaLoja() {
     }
 
     document.getElementById('loja-nome').value = state.lojaDoLojista.nome || '';
-    document.getElementById('loja-endereco').value = state.lojaDoLojista.endereco || '';
+    preencherEndereco('loja', state.lojaDoLojista);
     document.getElementById('loja-telefone').value = state.lojaDoLojista.telefone || '';
     document.getElementById('loja-resumo-nome').innerText = state.lojaDoLojista.nome || '-';
     document.getElementById('loja-resumo-endereco').innerText = state.lojaDoLojista.endereco || '-';

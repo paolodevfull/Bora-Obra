@@ -64,6 +64,8 @@ Arquitetura em camadas, priorizando o **Princípio da Responsabilidade Única (S
 * **Gráficos:** Chart.js 4.4.7, servido localmente em `frontend/static/vendor/`
 * **Mapa:** Leaflet 1.9.4 com tiles e atribuição do OpenStreetMap
 * **Geolocalização:** Geolocation API, cálculo de Haversine e geocodificação de endereços com Nominatim
+* **Endereços:** ViaCEP para preenchimento automático de logradouro, bairro, cidade e UF
+* **Formulários:** máscaras brasileiras para CEP, telefone, UF, número de endereço e valores monetários
 * **Arquitetura:** Layered Architecture com padrão Repository e Services orientados a caso de uso
 
 ---
@@ -89,6 +91,8 @@ Conta de demonstração criada apenas quando a base está totalmente vazia: `dem
 No ambiente local, acesse a aplicação por `http://127.0.0.1:5000` ou `http://localhost:5000`. Em produção, a localização do navegador exige **HTTPS**. O cliente precisa autorizar o acesso à localização; caso negue, o catálogo e a busca textual de lojas continuam disponíveis.
 
 O endereço da loja deve ser completo — rua, número, bairro, cidade, estado e CEP. No cadastro ou quando o endereço é alterado, o backend consulta o Nominatim uma única vez e persiste `latitude` e `longitude`. A posição do cliente permanece no navegador e não é enviada ao backend.
+
+Nos formulários de conta, cliente e loja, o frontend consulta o [ViaCEP](https://viacep.com.br/) após a digitação dos oito números do CEP. Logradouro, bairro, cidade e UF são preenchidos automaticamente; número e complemento continuam sob responsabilidade do usuário. Se o serviço estiver indisponível, todos os campos permanecem editáveis para preenchimento manual.
 
 Lojas criadas antes da inclusão deste recurso precisam ter o endereço salvo novamente para receber coordenadas. É possível desabilitar a geocodificação externa com:
 

@@ -12,5 +12,8 @@ class AutenticarUserService:
         usuario = UserRepository.buscar_por_email(email)
         if not usuario or not usuario.verificar_senha(senha):
             raise ServiceError("E-mail ou senha inválidos.", 401)
+        nome = str(dados.get('nome') or '').strip()
+        if nome and nome.casefold() != usuario.nome.casefold():
+            raise ServiceError("Nome da conta, e-mail ou senha inválidos.", 401)
 
         return usuario.to_dict()

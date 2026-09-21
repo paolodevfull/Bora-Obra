@@ -4,6 +4,7 @@ import { exibirNotificacao } from './ui.js';
 import { carregarRelatorioLucro, carregarLojas, carregarUsuarios, carregarProdutos, carregarPedidos } from './gestao.js';
 import { carregarLojasCliente } from './catalogo.js';
 import { carregarMeusPedidos } from './pedidos.js';
+import { obterEndereco, preencherEndereco } from './utils.js';
 
 export async function verificarSessaoAtiva() {
     try {
@@ -46,6 +47,7 @@ export async function realizarLogin(e) {
     esconderErroAuth();
 
     const dados = {
+        nome: document.getElementById('login-nome').value,
         email: document.getElementById('login-email').value,
         senha: document.getElementById('login-senha').value
     };
@@ -74,7 +76,8 @@ export async function realizarCadastro(e) {
         nome: document.getElementById('cad-nome').value,
         email: document.getElementById('cad-email').value,
         senha: document.getElementById('cad-senha').value,
-        tipo: document.getElementById('cad-tipo').value
+        tipo: document.getElementById('cad-tipo').value,
+        ...obterEndereco('cad')
     };
 
     try {
@@ -90,7 +93,7 @@ export async function realizarCadastro(e) {
         const loginRes = await apiRequest('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: dados.email, senha: dados.senha })
+            body: JSON.stringify({ nome: dados.nome, email: dados.email, senha: dados.senha })
         });
         const loginResposta = await loginRes.json();
 
@@ -166,14 +169,14 @@ export function abrirConfiguracoesCliente() {
     document.getElementById('cliente-perfil-menu').classList.add('hidden');
     document.getElementById('config-cliente-nome').value = state.usuarioAtual.nome || '';
     document.getElementById('config-cliente-email').value = state.usuarioAtual.email || '';
-    document.getElementById('config-cliente-endereco').value = state.usuarioAtual.endereco || '';
+    preencherEndereco('config-cliente', state.usuarioAtual);
     document.getElementById('config-cliente-senha').value = '';
     document.getElementById('cliente-config-modal').classList.remove('hidden');
 }
 export function fecharConfiguracoesCliente() { document.getElementById('cliente-config-modal').classList.add('hidden'); }
 export async function salvarConfiguracoesCliente(e) {
     e.preventDefault();
-    const dados = { nome: document.getElementById('config-cliente-nome').value, email: document.getElementById('config-cliente-email').value, endereco: document.getElementById('config-cliente-endereco').value, senha: document.getElementById('config-cliente-senha').value };
+    const dados = { nome: document.getElementById('config-cliente-nome').value, email: document.getElementById('config-cliente-email').value, senha: document.getElementById('config-cliente-senha').value, ...obterEndereco('config-cliente') };
     try { const res = await apiRequest('/api/users/me', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) }); const usuario = await res.json(); if (!res.ok) throw new Error(usuario.erro || 'Não foi possível salvar.'); state.usuarioAtual = usuario; document.getElementById('cliente-nome-display').innerText = usuario.nome; document.getElementById('carrinho-endereco').value = usuario.endereco || ''; fecharConfiguracoesCliente(); exibirNotificacao('Configurações atualizadas!'); } catch (err) { exibirNotificacao(err.message, true); }
 }
 // ============ PAINEL LOJISTA ============

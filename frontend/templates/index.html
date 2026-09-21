@@ -26,6 +26,10 @@
                     <p>Entre com sua conta para continuar.</p>
                     <form id="form-login">
                         <div class="input-group">
+                            <label>Nome da conta</label>
+                            <input type="text" id="login-nome" autocomplete="name" maxlength="100" placeholder="Como seu nome foi cadastrado" required>
+                        </div>
+                        <div class="input-group">
                             <label>E-mail</label>
                             <input type="email" id="login-email" placeholder="seu@email.com" required>
                         </div>
@@ -43,8 +47,8 @@
                     <p>Crie sua conta no BoraObra.</p>
                     <form id="form-cadastro">
                         <div class="input-group">
-                            <label>Nome completo</label>
-                            <input type="text" id="cad-nome" placeholder="Ex: João da Silva" required>
+                            <label>Nome da conta</label>
+                            <input type="text" id="cad-nome" autocomplete="name" maxlength="100" placeholder="Ex: João da Silva" required>
                         </div>
                         <div class="input-group">
                             <label>E-mail</label>
@@ -61,6 +65,18 @@
                                 <option value="lojista">Lojista (quero gerenciar minha loja)</option>
                             </select>
                         </div>
+                        <fieldset class="address-fieldset">
+                            <legend>Endereço <small>(opcional)</small></legend>
+                            <div class="address-grid">
+                                <div class="input-group compact cep-field"><label>CEP</label><input id="cad-cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000"><small id="cad-cep-status" class="cep-status" aria-live="polite"></small></div>
+                                <div class="input-group compact street-field"><label>Logradouro</label><input id="cad-logradouro" autocomplete="address-line1" placeholder="Rua ou avenida"></div>
+                                <div class="input-group compact"><label>Número</label><input id="cad-numero" autocomplete="address-line2" maxlength="20" placeholder="123, 123-A ou S/N"></div>
+                                <div class="input-group compact"><label>Complemento</label><input id="cad-complemento" placeholder="Apto, bloco..."></div>
+                                <div class="input-group compact"><label>Bairro</label><input id="cad-bairro" placeholder="Bairro"></div>
+                                <div class="input-group compact"><label>Cidade</label><input id="cad-cidade" autocomplete="address-level2" placeholder="Cidade"></div>
+                                <div class="input-group compact uf-field"><label>UF</label><input id="cad-uf" autocomplete="address-level1" maxlength="2" placeholder="SP"></div>
+                            </div>
+                        </fieldset>
                         <button type="submit" class="btn-primary">Criar conta</button>
                     </form>
                     <p class="auth-switch">Já tem conta? <a href="#" data-action="auth-login">Entrar</a></p>
@@ -245,16 +261,25 @@
 <form id="form-cad-loja">
                                 <div class="input-group">
                                     <label>Nome da loja / depósito</label>
-                                    <input type="text" id="loja-nome" required placeholder="Ex: BoraObra Centro">
-                                </div>
-                                <div class="input-group">
-                                    <label>Endereço completo</label>
-                                    <input type="text" id="loja-endereco" required placeholder="Av. Principal, 1000">
+                                    <input type="text" id="loja-nome" maxlength="100" required placeholder="Ex: BoraObra Centro">
                                 </div>
                                 <div class="input-group">
                                     <label>Telefone / WhatsApp</label>
-                                    <input type="text" id="loja-telefone" placeholder="(31) 99999-9999">
+                                    <input type="tel" id="loja-telefone" autocomplete="tel" inputmode="tel" maxlength="15" placeholder="(31) 99999-9999">
                                 </div>
+                                <fieldset class="address-fieldset">
+                                    <legend>Endereço da loja</legend>
+                                    <div class="address-grid">
+                                        <div class="input-group compact cep-field"><label>CEP</label><input id="loja-cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required><small id="loja-cep-status" class="cep-status" aria-live="polite"></small></div>
+                                        <div class="input-group compact street-field"><label>Logradouro</label><input id="loja-logradouro" autocomplete="address-line1" placeholder="Rua ou avenida" required></div>
+                                        <div class="input-group compact"><label>Número</label><input id="loja-numero" maxlength="20" placeholder="123, 123-A ou S/N" required></div>
+                                        <div class="input-group compact"><label>Complemento</label><input id="loja-complemento" placeholder="Sala, galpão..."></div>
+                                        <div class="input-group compact"><label>Bairro</label><input id="loja-bairro" placeholder="Bairro" required></div>
+                                        <div class="input-group compact"><label>Cidade</label><input id="loja-cidade" autocomplete="address-level2" placeholder="Cidade" required></div>
+                                        <div class="input-group compact uf-field"><label>UF</label><input id="loja-uf" autocomplete="address-level1" maxlength="2" placeholder="SP" required></div>
+                                    </div>
+                                    <small class="field-help"><i class="fa-solid fa-location-dot"></i> Um endereço completo melhora a precisão no mapa de lojas próximas.</small>
+                                </fieldset>
                                 <button type="submit" class="btn-primary" id="loja-form-submit">Cadastrar minha loja</button>
                             </form>
                         </div>
@@ -291,7 +316,7 @@
                             <form id="form-cad-user">
                                 <div class="input-group">
                                     <label>Nome completo</label>
-                                    <input type="text" id="user-nome" required placeholder="Ex: João da Silva">
+                                    <input type="text" id="user-nome" maxlength="100" required placeholder="Ex: João da Silva">
                                 </div>
                                 <div class="input-group">
                                     <label>E-mail</label>
@@ -374,11 +399,11 @@
                                 <div class="grid-inputs">
                                     <div class="input-group">
                                         <label>Preço venda (R$)</label>
-                                        <input type="number" min="0.01" step="0.01" id="prod-preco-venda" required>
+                                        <input type="number" min="0.01" max="1000000000" step="0.01" inputmode="decimal" id="prod-preco-venda" required>
                                     </div>
                                     <div class="input-group">
                                         <label>Preço locação (R$)</label>
-                                        <input type="number" min="0.01" step="0.01" id="prod-preco-locacao" required>
+                                        <input type="number" min="0.01" max="1000000000" step="0.01" inputmode="decimal" id="prod-preco-locacao" required>
                                     </div>
                                 </div><fieldset class="availability-fields"><legend>Disponibilidade e classificação</legend><label><input type="checkbox" id="prod-disponivel_venda" checked> Disponível para venda</label><label><input type="checkbox" id="prod-disponivel_locacao" checked> Disponível para locação</label><label><input type="checkbox" id="prod-status_manutencao"> Em manutenção</label><label><input type="checkbox" id="prod-classificacao_curva_a"> Curva A (alta procura)</label></fieldset>
                                 <button type="submit" class="btn-primary">Salvar produto</button>
@@ -437,11 +462,11 @@
                             <div class="grid-inputs">
                                 <div class="input-group">
                                     <label>Preço venda (R$)</label>
-                                    <input type="number" min="0.01" step="0.01" id="edit-prod-preco-venda" required>
+                                    <input type="number" min="0.01" max="1000000000" step="0.01" inputmode="decimal" id="edit-prod-preco-venda" required>
                                 </div>
                                 <div class="input-group">
                                     <label>Preço locação (R$)</label>
-                                    <input type="number" min="0.01" step="0.01" id="edit-prod-preco-locacao" required>
+                                    <input type="number" min="0.01" max="1000000000" step="0.01" inputmode="decimal" id="edit-prod-preco-locacao" required>
                                 </div>
                             </div><fieldset class="availability-fields"><legend>Disponibilidade e classificação</legend><label><input type="checkbox" id="edit-prod-disponivel_venda" checked> Disponível para venda</label><label><input type="checkbox" id="edit-prod-disponivel_locacao" checked> Disponível para locação</label><label><input type="checkbox" id="edit-prod-status_manutencao"> Em manutenção</label><label><input type="checkbox" id="edit-prod-classificacao_curva_a"> Curva A (alta procura)</label></fieldset>
                             <div class="grid-inputs">
@@ -640,9 +665,20 @@
         <div class="form-card edit-modal-card">
             <h3 id="cliente-config-title">Minhas configurações</h3>
             <form id="form-config-cliente">
-                <div class="input-group"><label>Nome</label><input id="config-cliente-nome" required></div>
+                <div class="input-group"><label>Nome da conta</label><input id="config-cliente-nome" autocomplete="name" required></div>
                 <div class="input-group"><label>E-mail</label><input id="config-cliente-email" type="email" required></div>
-                <div class="input-group"><label>Endereço padrão de entrega</label><input id="config-cliente-endereco" autocomplete="street-address" placeholder="Rua, número, bairro, cidade"></div>
+                <fieldset class="address-fieldset">
+                    <legend>Endereço padrão de entrega</legend>
+                    <div class="address-grid">
+                        <div class="input-group compact cep-field"><label>CEP</label><input id="config-cliente-cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000"><small id="config-cliente-cep-status" class="cep-status" aria-live="polite"></small></div>
+                        <div class="input-group compact street-field"><label>Logradouro</label><input id="config-cliente-logradouro" autocomplete="address-line1" placeholder="Rua ou avenida"></div>
+                        <div class="input-group compact"><label>Número</label><input id="config-cliente-numero" maxlength="20" placeholder="123, 123-A ou S/N"></div>
+                        <div class="input-group compact"><label>Complemento</label><input id="config-cliente-complemento" placeholder="Apto, bloco..."></div>
+                        <div class="input-group compact"><label>Bairro</label><input id="config-cliente-bairro" placeholder="Bairro"></div>
+                        <div class="input-group compact"><label>Cidade</label><input id="config-cliente-cidade" autocomplete="address-level2" placeholder="Cidade"></div>
+                        <div class="input-group compact uf-field"><label>UF</label><input id="config-cliente-uf" autocomplete="address-level1" maxlength="2" placeholder="SP"></div>
+                    </div>
+                </fieldset>
                 <div class="input-group"><label>Nova senha <small>(opcional)</small></label><input id="config-cliente-senha" type="password" minlength="6" placeholder="Deixe em branco para manter"></div>
                 <div class="grid-inputs"><button type="button" class="btn-secondary" data-action="perfil-config-fechar">Cancelar</button><button type="submit" class="btn-primary">Salvar configurações</button></div>
             </form>

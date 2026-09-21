@@ -3,6 +3,7 @@ from backend.repositories.loja_repository import LojaRepository
 from backend.models.loja import Loja
 from backend.services.errors import ServiceError
 from backend.services.geocoding import geocodificar_endereco
+from backend.services.endereco import normalizar_endereco, CAMPOS_ENDERECO
 
 
 class EditarLojaService:
@@ -14,13 +15,15 @@ class EditarLojaService:
             raise ServiceError("Você não tem permissão para editar esta loja.", 403)
 
         nome = texto(dados.get('nome',loja.nome), 'Nome', 3, 100)
-        endereco = texto(dados.get('endereco',loja.endereco), 'Endereço', 5, 200)
+        atual = {campo: getattr(loja, campo, '') for campo in (*CAMPOS_ENDERECO, 'endereco')}
+        endereco = normalizar_endereco(dados, atual, obrigatorio=True)
         telefone = str(dados.get('telefone',loja.telefone) or '').strip()
-        endereco_alterado = endereco != loja.endereco
+        endereco_alterado = endereco['endereco'] != loja.endereco
         loja.nome = nome
-        loja.endereco = endereco
+        loja.endereco = endereco['endereco']
         loja.telefone = telefone
+        for campo in CAMPOS_ENDERECO: setattr(loja, campo, endereco[campo])
         if endereco_alterado or loja.latitude is None or loja.longitude is None:
-            loja.latitude, loja.longitude = geocodificar_endereco(endereco)
+            loja.latitude, loja.longitude = geocodificar_endereco(endereco['endereco'])
         LojaRepository.atualizar(loja)
         return loja.to_dict()

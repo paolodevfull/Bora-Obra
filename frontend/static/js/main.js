@@ -8,6 +8,8 @@ import { debounce } from './utils.js';
 import { state } from './state.js';
 import * as dashboard from './dashboard.js';
 import { ativarLocalizacao, definirRaio, atualizarTamanhoMapa } from './mapa-lojas.js';
+import { configurarViaCep } from './viacep.js';
+import { configurarMascaras } from './mascaras.js';
 
 const forms = {
     'form-login': auth.realizarLogin,
@@ -190,6 +192,8 @@ function registrarEventos() {
 
 document.addEventListener('DOMContentLoaded', () => {
     registrarEventos();
+    configurarViaCep(['cad', 'loja', 'config-cliente']);
+    configurarMascaras();
     document.querySelectorAll('.input-group').forEach(group => {
         const label = group.querySelector('label');
         const input = group.querySelector('input, select, textarea');

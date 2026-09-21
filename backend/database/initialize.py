@@ -3,8 +3,8 @@ from sqlalchemy import inspect, text
 from backend.database.database import db
 import backend.models
 ADDITIONS = {
-    'users': {'endereco':'VARCHAR(250)', 'responsavel_id':'INTEGER REFERENCES users(id)', 'senha_hash':"VARCHAR(255) NOT NULL DEFAULT ''"},
-    'lojas': {'lojista_id':'INTEGER REFERENCES users(id)', 'latitude':'REAL', 'longitude':'REAL'},
+    'users': {'endereco':'VARCHAR(300)', 'responsavel_id':'INTEGER REFERENCES users(id)', 'senha_hash':"VARCHAR(255) NOT NULL DEFAULT ''", 'cep':'VARCHAR(9)', 'logradouro':'VARCHAR(150)', 'numero':'VARCHAR(20)', 'complemento':'VARCHAR(100)', 'bairro':'VARCHAR(100)', 'cidade':'VARCHAR(100)', 'uf':'VARCHAR(2)'},
+    'lojas': {'lojista_id':'INTEGER REFERENCES users(id)', 'latitude':'REAL', 'longitude':'REAL', 'cep':'VARCHAR(9)', 'logradouro':'VARCHAR(150)', 'numero':'VARCHAR(20)', 'complemento':'VARCHAR(100)', 'bairro':'VARCHAR(100)', 'cidade':'VARCHAR(100)', 'uf':'VARCHAR(2)'},
     'item_pedidos': {'dias_locacao':'INTEGER NOT NULL DEFAULT 1'},
     'pedidos': {'tipo':"VARCHAR(20) DEFAULT 'Venda'", 'forma_pagamento':'VARCHAR(30)', 'endereco_entrega':'TEXT', 'observacao':'TEXT'},
     'produtos': {'disponivel_venda':'BOOLEAN NOT NULL DEFAULT 1', 'disponivel_locacao':'BOOLEAN NOT NULL DEFAULT 1', 'status_manutencao':'BOOLEAN NOT NULL DEFAULT 0', 'classificacao_curva_a':'BOOLEAN NOT NULL DEFAULT 0', 'descricao':'TEXT', 'cor_tamanho':'VARCHAR(100)'}
