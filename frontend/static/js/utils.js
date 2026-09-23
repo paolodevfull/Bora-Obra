@@ -21,7 +21,15 @@ export function formatarDataHora(value) {
     const date = new Date(normalized);
     return Number.isNaN(date.getTime())
         ? String(value)
-        : new Intl.DateTimeFormat('pt-BR', {dateStyle: 'short', timeStyle: 'short'}).format(date);
+        : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(date);
+}
+
+export function formatarData(value) {
+    if (!value) return '-';
+    const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
+    return Number.isNaN(date.getTime())
+        ? String(value)
+        : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(date);
 }
 
 export const CAMPOS_ENDERECO = ['cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'uf'];

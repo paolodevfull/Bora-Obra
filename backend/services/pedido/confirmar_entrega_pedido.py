@@ -12,8 +12,8 @@ class ConfirmarEntregaPedidoService:
         if pedido.user_id != user_id:
             raise ServiceError("Você não tem permissão para alterar este pedido.", 403)
 
-        if pedido.status == 'Cancelado':
-            raise ServiceError('Pedido cancelado não pode ser entregue.')
+        if pedido.status != 'Despachado':
+            raise ServiceError('Confirme a entrega somente quando o pedido estiver a caminho.')
         pedido.status = 'Entregue'
         PedidoRepository.atualizar(pedido)
         return pedido.to_dict()

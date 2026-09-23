@@ -26,7 +26,7 @@ Arquitetura em camadas, priorizando o **Princípio da Responsabilidade Única (S
 ## 🚀 Funcionalidades
 
 ### Autenticação e perfis de usuário
-- Cadastro e login com senha (hash), sessão persistente.
+- Cadastro e login com senha protegida por hash, sessão assinada, token CSRF e limite de tentativas.
 - Três perfis operacionais — **Cliente**, **Lojista** e **Funcionário** — cada um com sua própria experiência:
   - **Lojista:** painel de gestão para lojas, funcionários, produtos, pedidos e indicadores.
   - **Cliente:** busca lojas, navega pelo catálogo, monta um pedido (venda ou locação) e acompanha o status em "Meus pedidos".
@@ -60,11 +60,11 @@ Arquitetura em camadas, priorizando o **Princípio da Responsabilidade Única (S
 ## 💻 Tecnologias Utilizadas
 
 * **Backend:** Python, Flask, Flask-SQLAlchemy, SQLite, Werkzeug (hash de senha)
-* **Frontend:** HTML5, CSS3 e JavaScript Vanilla modular (SPA — single page application)
+* **Frontend:** HTML5, CSS3 e JavaScript Vanilla modular, com uma página HTML independente por área
 * **Gráficos:** Chart.js 4.4.7, servido localmente em `frontend/static/vendor/`
 * **Mapa:** Leaflet 1.9.4 com tiles e atribuição do OpenStreetMap
 * **Geolocalização:** Geolocation API, cálculo de Haversine e geocodificação de endereços com Nominatim
-* **Endereços:** ViaCEP para preenchimento automático de logradouro, bairro, cidade e UF
+* **Endereços:** ViaCEP para preenchimento e BrasilAPI como fallback de coordenadas por CEP
 * **Formulários:** máscaras brasileiras para CEP, telefone, UF, número de endereço e valores monetários
 * **Arquitetura:** Layered Architecture com padrão Repository e Services orientados a caso de uso
 
@@ -82,9 +82,7 @@ python app.py
 
 A aplicação sobe em `http://127.0.0.1:5000`.
 
-Na inicialização, o sistema cria as tabelas ausentes, aplica migrações aditivas compatíveis com o SQLite e popula uma base vazia com dados de demonstração. O banco existente não é apagado. Em produção, defina `FLASK_SECRET_KEY`, `DATABASE_URL` e desative o seed com `BORAOBRA_SEED=0`.
-
-Conta de demonstração criada apenas quando a base está totalmente vazia: `demo@boraobra.local` / `BoraObra123!` (a senha pode ser alterada com `BORAOBRA_DEMO_PASSWORD`).
+Na inicialização, o sistema cria as tabelas ausentes e aplica migrações aditivas compatíveis com o SQLite. O banco existente não é apagado e nenhuma conta de demonstração é criada automaticamente. Em produção, defina `BORAOBRA_ENV=production`, `FLASK_SECRET_KEY`, `DATABASE_URL` e `FLASK_COOKIE_SECURE=1`.
 
 ### Mapa e lojas próximas
 
@@ -112,7 +110,9 @@ O cálculo da distância usa a fórmula de Haversine, considerando a curvatura d
 posição do cliente + coordenadas da loja → distância em km → filtro pelo raio escolhido
 ```
 
-Referências: [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/) e [política de uso do Nominatim](https://operations.osmfoundation.org/policies/nominatim/).
+Quando o Nominatim não encontra o endereço completo, o backend tenta consultas mais amplas e, por último, a BrasilAPI pelo CEP. O fallback por CEP é aproximado e pode posicionar endereços próximos no mesmo ponto.
+
+Referências: [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), [política do Nominatim](https://operations.osmfoundation.org/policies/nominatim/) e [BrasilAPI](https://brasilapi.com.br/).
 
 ### Dashboards e Chart.js
 
@@ -146,15 +146,27 @@ Bora-Obra/
 │   ├── repositories/      # Consultas complexas e relatórios
 │   └── services/           # Regras de negócio, isoladas por domínio
 ├── frontend/
+│   ├── login.html          # Entrada na conta
+│   ├── cadastro.html       # Criação de conta
+│   ├── cliente/            # Catálogo, conta, painel e pedidos do cliente
+│   ├── lojista/            # Uma página HTML para cada área operacional
 │   ├── static/
 │   │   ├── css/style.css
-│   │   ├── js/             # API, dashboard, gráficos, catálogo, mapa e ticket
+│   │   ├── js/             # Componentes, API, dashboards, catálogo, mapa e ticket
 │   │   └── vendor/         # Chart.js e Leaflet servidos localmente
-│   └── templates/
-│       └── index.html      # SPA única (painel lojista + painel cliente + placeholder entregador)
 ├── app.py                  # Ponto de entrada do Flask
 └── README.md
 ```
+
+As páginas são HTML estático, sem Jinja. O Flask serve os arquivos e mantém apenas APIs, sessão, validações, regras de negócio e banco de dados. Cabeçalhos, menus, modais e navegação compartilhada são montados no cliente por `frontend/static/js/components.js`.
+
+## 📚 Documentação
+
+- [Arquitetura e decisões técnicas](docs/architecture.md)
+- [Catálogo da API](docs/api.md)
+- [Manual de cliente, lojista e funcionário](docs/user-guide.md)
+- [Segurança, integrações, ambiente e produção](docs/security-and-operations.md)
+- [.env.example](.env.example) com as variáveis aceitas
 
 ---
 

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Minha conta · BoraObra</title>
+    <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+    <script src="/static/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/static/css/tokens.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="cliente" data-page="perfil-cliente">
+    <div id="notifications" class="notifications" aria-live="polite"></div>
+    <div id="app-shell"></div>
+    <main id="static-page-content" class="static-page-content">
+        <section id="cliente-config-modal" class="cliente-section active" aria-labelledby="cliente-config-title">
+            <div class="form-card edit-modal-card">
+                <span class="eyebrow">Sua conta</span>
+                <h2 id="cliente-config-title">Dados pessoais e endereço</h2>
+                <p class="section-intro">
+                    Mantenha seus dados atualizados para facilitar seus próximos
+                    pedidos.
+                </p>
+                <section class="theme-settings compact" aria-labelledby="tema-cliente-titulo">
+                    <div>
+                        <h3 id="tema-cliente-titulo">Aparência</h3>
+                        <p>Escolha como o BoraObra deve aparecer.</p>
+                    </div>
+                    <div class="theme-choice" role="radiogroup" aria-label="Tema da interface">
+                        <button type="button" role="radio" data-action="tema-selecionar" data-theme="light">
+                            <i class="fa-solid fa-sun"></i><span><strong>Claro</strong><small>Neutro e
+                                    suave</small></span>
+                        </button>
+                        <button type="button" role="radio" data-action="tema-selecionar" data-theme="dark">
+                            <i class="fa-solid fa-moon"></i><span><strong>Escuro</strong><small>Menos
+                                    brilho</small></span>
+                        </button>
+                        <button type="button" role="radio" data-action="tema-selecionar" data-theme="system">
+                            <i class="fa-solid fa-display"></i><span><strong>Sistema</strong><small>Segue o
+                                    dispositivo</small></span>
+                        </button>
+                    </div>
+                </section>
+                <form id="form-config-cliente">
+                    <div class="input-group">
+                        <label>Nome da conta</label><input id="config-cliente-nome" autocomplete="name" required />
+                    </div>
+                    <div class="input-group">
+                        <label>E-mail</label><input id="config-cliente-email" type="email" required />
+                    </div>
+                    <fieldset class="address-fieldset">
+                        <legend>Endereço padrão de entrega</legend>
+                        <div class="address-grid">
+                            <div class="input-group compact cep-field">
+                                <label>CEP</label><input id="config-cliente-cep" inputmode="numeric"
+                                    autocomplete="postal-code" maxlength="9" placeholder="00000-000" /><small
+                                    id="config-cliente-cep-status" class="cep-status" aria-live="polite"></small>
+                            </div>
+                            <div class="input-group compact street-field">
+                                <label>Logradouro</label><input id="config-cliente-logradouro"
+                                    autocomplete="address-line1" placeholder="Rua ou avenida" />
+                            </div>
+                            <div class="input-group compact">
+                                <label>Número</label><input id="config-cliente-numero" maxlength="20"
+                                    placeholder="123, 123-A ou S/N" />
+                            </div>
+                            <div class="input-group compact">
+                                <label>Complemento</label><input id="config-cliente-complemento"
+                                    placeholder="Apto, bloco..." />
+                            </div>
+                            <div class="input-group compact">
+                                <label>Bairro</label><input id="config-cliente-bairro" placeholder="Bairro" />
+                            </div>
+                            <div class="input-group compact">
+                                <label>Cidade</label><input id="config-cliente-cidade" autocomplete="address-level2"
+                                    placeholder="Cidade" />
+                            </div>
+                            <div class="input-group compact uf-field">
+                                <label>UF</label><input id="config-cliente-uf" autocomplete="address-level1"
+                                    maxlength="2" placeholder="SP" />
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="input-group">
+                        <label>Nova senha <small>(opcional)</small></label><input id="config-cliente-senha"
+                            type="password" minlength="6" placeholder="Deixe em branco para manter" />
+                    </div>
+                    <div class="grid-inputs">
+                        <button type="button" class="btn-secondary" data-action="cliente-catalogo">
+                            Cancelar</button><button type="submit" class="btn-primary">
+                            Salvar configurações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+    <div id="shared-modals"></div>
+    <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

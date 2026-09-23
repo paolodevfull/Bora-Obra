@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vendas e pedidos · BoraObra</title>
+  <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+  <script src="/static/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="lojista" data-page="pedidos">
+  <div id="notifications" class="notifications" aria-live="polite"></div>
+  <div id="app-shell"></div>
+  <main id="static-page-content" class="static-page-content">
+    <section id="tab-vendas" class="content-section active">
+      <header class="section-header">
+        <div>
+          <h2>Gestão de vendas</h2>
+          <p>
+            Aprove pedidos, prepare retiradas, registre devoluções e imprima
+            tickets.
+          </p>
+        </div>
+        <button class="btn-secondary" type="button" data-action="pedidos-gestao-atualizar">
+          <i class="fa-solid fa-arrows-rotate"></i> Atualizar
+        </button>
+      </header>
+
+      <div class="filter-bar">
+        <div class="topbar-search order-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" id="filtro-pedido-cliente" placeholder="Buscar pelo nome do cliente"
+            aria-label="Buscar pelo nome do cliente" />
+        </div>
+        <select id="filtro-pedido-status" class="filter-select" aria-label="Filtrar por status">
+          <option value="">Todos os status</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Confirmado">A preparar</option>
+          <option value="Despachado">Pronto para retirar</option>
+          <option value="Entregue">Concluído / Devolvido</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+        <select id="filtro-pedido-tipo" class="filter-select" aria-label="Filtrar por tipo">
+          <option value="">Venda e locação</option>
+          <option value="Venda">Venda</option>
+          <option value="Locacao">Locação</option>
+        </select>
+        <input id="filtro-pedido-data" class="filter-select" type="date" aria-label="Filtrar por data" />
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Tipo</th>
+                <th>Valor total</th>
+                <th>Endereço de entrega</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-pedidos">
+              <tr>
+                <td colspan="6" class="empty-state">Carregando pedidos...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="shared-modals"></div>
+  <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Criar conta · BoraObra</title>
+  <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+  <script src="/static/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="auth" data-page="cadastro">
+  <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo</a>
+  <div id="notifications" class="notifications" aria-live="polite"></div>
+  <div id="app-shell"></div>
+  <main id="conteudo-principal" class="auth-overlay auth-register">
+    <section class="auth-card auth-card-register" aria-labelledby="register-title">
+      <div class="auth-brand-panel">
+        <i class="fa-solid fa-helmet-safety"></i>
+        <h1>BoraObra</h1>
+        <p>
+          Crie sua conta em poucos passos. Você poderá completar os demais
+          dados depois.
+        </p>
+      </div>
+      <div class="auth-form-panel">
+        <div class="auth-heading">
+          <div>
+            <span class="eyebrow">Comece agora</span>
+            <h2 id="register-title">Criar uma conta</h2>
+            <p>Preencha os dados básicos para continuar.</p>
+          </div>
+        </div>
+        <form id="form-cadastro" novalidate>
+          <div class="grid-inputs">
+            <div class="input-group">
+              <label for="cad-nome">Nome completo</label><input id="cad-nome" autocomplete="name" maxlength="100"
+                placeholder="Ex.: João da Silva" required /><small class="field-error" id="cad-nome-error"></small>
+            </div>
+            <div class="input-group">
+              <label for="cad-telefone">Telefone</label><input type="tel" id="cad-telefone" autocomplete="tel"
+                inputmode="tel" maxlength="15" placeholder="(31) 99999-9999" /><small class="field-error"
+                id="cad-telefone-error"></small>
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="cad-email">E-mail</label><input type="email" id="cad-email" autocomplete="email"
+              placeholder="seu@email.com" required /><small class="field-error" id="cad-email-error"></small>
+          </div>
+          <div class="grid-inputs">
+            <div class="input-group">
+              <label for="cad-senha">Senha</label>
+              <div class="password-field">
+                <input type="password" id="cad-senha" autocomplete="new-password" minlength="6"
+                  placeholder="Pelo menos 6 caracteres" required /><button type="button" data-action="senha-toggle"
+                  data-target="cad-senha" aria-label="Mostrar senha">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+              <small class="password-help">Use pelo menos 6 caracteres.</small><small class="field-error"
+                id="cad-senha-error"></small>
+            </div>
+            <div class="input-group">
+              <label for="cad-confirmar-senha">Confirmar senha</label>
+              <div class="password-field">
+                <input type="password" id="cad-confirmar-senha" autocomplete="new-password" minlength="6"
+                  placeholder="Digite novamente" required /><button type="button" data-action="senha-toggle"
+                  data-target="cad-confirmar-senha" aria-label="Mostrar senha">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+              <small class="field-error" id="cad-confirmar-senha-error"></small>
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="cad-tipo">Como você pretende usar o BoraObra?</label><select id="cad-tipo">
+              <option value="cliente">Quero comprar ou alugar</option>
+              <option value="lojista">
+                Quero anunciar produtos da minha loja
+              </option>
+            </select>
+          </div>
+          <label class="terms-check"><input id="cad-termos" type="checkbox" required /><span>Li e aceito os termos de
+              uso e a política de privacidade.</span></label>
+          <div id="auth-erro" class="auth-erro hidden" role="alert"></div>
+          <button type="submit" class="btn-primary">
+            <span>Criar conta</span>
+          </button>
+        </form>
+        <p class="auth-switch">
+          Já tem uma conta? <a href="/login.html">Voltar para o login</a>
+        </p>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

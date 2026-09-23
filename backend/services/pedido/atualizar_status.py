@@ -1,6 +1,7 @@
 from backend.repositories.pedido_repository import PedidoRepository
 from backend.services.acesso import AcessoService
 from backend.services.errors import ServiceError
+from backend.services.pedido.estoque_pedido import devolver_estoque_da_venda
 
 
 class AtualizarStatusPedidoService:
@@ -19,5 +20,7 @@ class AtualizarStatusPedidoService:
         status = dados.get('status')
         if not isinstance(status, str) or status not in self.TRANSICOES.get(pedido.status, set()):
             raise ServiceError('Esta mudança de status não é permitida.')
+        if status == 'Cancelado':
+            devolver_estoque_da_venda(pedido)
         pedido.status = status
         return PedidoRepository.atualizar(pedido).to_dict()

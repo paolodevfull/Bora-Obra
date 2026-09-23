@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Resumo · BoraObra</title>
+  <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+  <script src="/static/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="lojista" data-page="dashboard">
+  <div id="notifications" class="notifications" aria-live="polite"></div>
+  <div id="app-shell"></div>
+  <main id="static-page-content" class="static-page-content">
+    <section id="tab-dashboard" class="content-section active">
+      <header class="section-header">
+        <div>
+          <h2>Visão geral do sistema</h2>
+          <p>Acompanhe pedidos, produtos e resultados da sua loja.</p>
+        </div>
+        <div class="header-actions">
+          <label class="period-filter">Período<select id="periodo-dashboard-lojista">
+              <option value="hoje">Hoje</option>
+              <option value="7d">Últimos 7 dias</option>
+              <option value="30d">Últimos 30 dias</option>
+              <option value="mes">Este mês</option>
+              <option value="personalizado">Personalizado</option>
+            </select></label><button class="btn-secondary" type="button" data-action="gestao-tab"
+            data-tab="tab-produtos">
+            <i class="fa-solid fa-plus"></i> Cadastrar produto</button><button class="btn-secondary" type="button"
+            data-action="dashboard-recarregar" data-profile="lojista">
+            <i class="fa-solid fa-arrows-rotate"></i> Atualizar dados
+          </button>
+        </div>
+      </header>
+      <div id="periodo-personalizado-lojista" class="custom-period hidden">
+        <label>De<input id="periodo-inicio-lojista" type="date" /></label><label>Até<input id="periodo-fim-lojista"
+            type="date" /></label><button class="btn-secondary" type="button" data-action="dashboard-periodo-aplicar"
+          data-profile="lojista">
+          Aplicar
+        </button>
+      </div>
+
+      <div class="metrics-grid">
+        <button class="metric-card featured" type="button" data-action="gestao-tab" data-tab="tab-vendas">
+          <i class="fa-solid fa-wallet"></i>
+          <div>
+            <small>Receita no período</small>
+            <h3 id="dash-faturamento">R$ 0,00</h3>
+          </div>
+        </button>
+        <button class="metric-card" type="button" data-action="gestao-tab" data-tab="tab-vendas">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <div>
+            <small>Aluguéis ativos</small>
+            <h3 id="dash-alugueis">0</h3>
+          </div>
+        </button>
+        <button class="metric-card highlight" type="button" data-action="gestao-tab" data-tab="tab-vendas">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <div>
+            <small>Pedidos pendentes</small>
+            <h3 id="dash-pendentes">0</h3>
+          </div>
+        </button>
+        <button class="metric-card" type="button" data-action="gestao-tab" data-tab="tab-produtos">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <div>
+            <small>Total de produtos</small>
+            <h3 id="dash-produtos">0</h3>
+          </div>
+        </button>
+        <button class="metric-card highlight" type="button" data-action="gestao-tab" data-tab="tab-produtos">
+          <i class="fa-solid fa-circle-check"></i>
+          <div>
+            <small>Produtos disponíveis</small>
+            <h3 id="dash-disponiveis">0</h3>
+          </div>
+        </button>
+      </div>
+      <div id="lojista-dashboard-kpis-extra" class="dashboard-kpis dashboard-kpis-secondary"></div>
+
+      <div id="dashboard-charts-lojista" class="dashboard-charts" aria-live="polite">
+        <article class="chart-card chart-wide">
+          <header>
+            <div>
+              <span class="eyebrow">Receita</span>
+              <h3>Faturamento ao longo do tempo</h3>
+            </div>
+          </header>
+          <div class="chart-frame">
+            <canvas id="chart-lojista-faturamento" aria-label="Faturamento de vendas e locações ao longo do tempo"
+              role="img"></canvas>
+            <div class="chart-state hidden"></div>
+          </div>
+        </article>
+        <article class="chart-card">
+          <header>
+            <div>
+              <span class="eyebrow">Operação</span>
+              <h3>Pedidos por status</h3>
+            </div>
+          </header>
+          <div class="chart-frame">
+            <canvas id="chart-lojista-status" aria-label="Distribuição de pedidos por status" role="img"></canvas>
+            <div class="chart-state hidden"></div>
+          </div>
+        </article>
+        <article class="chart-card">
+          <header>
+            <div>
+              <span class="eyebrow">Modalidades</span>
+              <h3>Vendas versus locações</h3>
+            </div>
+          </header>
+          <div class="chart-frame">
+            <canvas id="chart-lojista-modalidades" aria-label="Comparação entre vendas e locações" role="img"></canvas>
+            <div class="chart-state hidden"></div>
+          </div>
+        </article>
+        <article class="chart-card">
+          <header>
+            <div>
+              <span class="eyebrow">Catálogo</span>
+              <h3>Produtos mais procurados</h3>
+            </div>
+          </header>
+          <div class="chart-frame">
+            <canvas id="chart-lojista-produtos" aria-label="Produtos mais procurados no período" role="img"></canvas>
+            <div class="chart-state hidden"></div>
+          </div>
+        </article>
+        <article class="chart-card">
+          <header>
+            <div>
+              <span class="eyebrow">Categorias</span>
+              <h3>Desempenho por categoria</h3>
+            </div>
+          </header>
+          <div class="chart-frame">
+            <canvas id="chart-lojista-categorias" aria-label="Quantidade pedida por categoria no período"
+              role="img"></canvas>
+            <div class="chart-state hidden"></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dash-columns">
+        <div class="table-card">
+          <h3>Últimos pedidos</h3>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Modalidade</th>
+                  <th>Valor total</th>
+                  <th>Data</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-pedidos-dash">
+                <tr>
+                  <td colspan="6" class="empty-state">
+                    Os pedidos recentes aparecerão aqui.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="alert-panel">
+          <h3>Central de atenção</h3>
+          <div id="dashboard-alertas" class="empty-state">
+            <i class="fa-solid fa-check dashboard-ok-icon"></i>
+            Nenhum alerta no momento.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="shared-modals"></div>
+  <script defer src="/static/vendor/chart.umd.min.js"></script>
+  <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

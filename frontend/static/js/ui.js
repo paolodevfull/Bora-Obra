@@ -1,5 +1,3 @@
-import { state } from './state.js';
-
 // Mapeia o texto de status pra uma classe de badge colorida
 export function badgeStatusClass(status) {
     const s = (status || '').toLowerCase();
@@ -39,29 +37,8 @@ export function statusPedidoLabel(status, tipo = '') {
 // Alias em português mantido para os módulos existentes.
 export const exibirNotificacao = showToast;
 
-// Navegação de Abas (painel lojista)
-export function trocarAba(tabId, el) {
-    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-
-    document.getElementById(tabId).classList.add('active');
-    if (el) el.classList.add('active');
-}
-
-// Navegação de Abas (painel cliente)
-export function trocarAbaCliente(tabId, el) {
-    document.querySelectorAll('.cliente-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.menu-btn-inline').forEach(b => b.classList.remove('active'));
-
-    document.getElementById(tabId).classList.add('active');
-    if (el) el.classList.add('active');
-}
-
-// ============ AUTENTICAÇÃO ============
-
-
 export function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }
 
 export function confirmarAcao(mensagem, titulo = 'Confirmar ação') {

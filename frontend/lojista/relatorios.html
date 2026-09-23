@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Relatórios · BoraObra</title>
+  <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+  <script src="/static/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="lojista" data-page="relatorios">
+  <div id="notifications" class="notifications" aria-live="polite"></div>
+  <div id="app-shell"></div>
+  <main id="static-page-content" class="static-page-content">
+    <section id="tab-relatorios" class="content-section active">
+      <header class="section-header">
+        <div>
+          <h2>Relatórios</h2>
+          <p>
+            Analise vendas e locações usando somente dados registrados no
+            sistema.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-secondary" type="button" data-action="relatorio-exportar-xml">
+            <i class="fa-solid fa-file-code"></i> Baixar XML</button><button class="btn-secondary" type="button"
+            data-action="relatorio-grafico-png">
+            <i class="fa-solid fa-image"></i> Gráfico PNG
+          </button>
+        </div>
+      </header>
+      <form id="form-relatorio-filtros" class="report-filters">
+        <div class="report-shortcuts">
+          <button type="button" data-action="relatorio-periodo" data-period="hoje">
+            Hoje</button><button type="button" data-action="relatorio-periodo" data-period="7d">
+            7 dias</button><button type="button" data-action="relatorio-periodo" data-period="30d">
+            30 dias</button><button type="button" data-action="relatorio-periodo" data-period="mes">
+            Mês atual
+          </button>
+        </div>
+        <label>Data inicial<input id="relatorio-inicio" type="date" required /></label><label>Data final<input
+            id="relatorio-fim" type="date" required /></label><label>Modalidade<select id="relatorio-tipo">
+            <option value="">Todas</option>
+            <option value="Venda">Venda</option>
+            <option value="Locacao">Locação</option>
+          </select></label><label>Status<select id="relatorio-status">
+            <option value="">Todos</option>
+            <option>Pendente</option>
+            <option>Confirmado</option>
+            <option>Despachado</option>
+            <option>Entregue</option>
+            <option>Cancelado</option>
+          </select></label><label>Pagamento<select id="relatorio-pagamento">
+            <option value="">Todos</option>
+            <option>Pix</option>
+            <option>Cartão de crédito</option>
+            <option>Cartão de débito</option>
+            <option>Dinheiro</option>
+          </select></label><label>Cliente<input id="relatorio-cliente"
+            placeholder="Nome do cliente" /></label><label>Produto<input id="relatorio-produto"
+            placeholder="Nome do produto" /></label><label>Categoria<input id="relatorio-categoria"
+            placeholder="Categoria" /></label><button class="btn-primary" type="submit">
+          <i class="fa-solid fa-filter"></i> Aplicar filtros
+        </button>
+      </form>
+      <div id="relatorio-filtros-ativos" class="active-filters" aria-live="polite"></div>
+      <div id="relatorio-kpis" class="dashboard-kpis"></div>
+      <article class="chart-card chart-wide">
+        <header>
+          <div>
+            <span class="eyebrow">Resultado filtrado</span>
+            <h3>Vendas e locações por dia</h3>
+          </div>
+        </header>
+        <div class="chart-frame">
+          <canvas id="chart-relatorio" role="img" aria-label="Vendas e locações no período"></canvas>
+          <div id="relatorio-chart-state" class="chart-state hidden"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="shared-modals"></div>
+  <script defer src="/static/vendor/chart.umd.min.js"></script>
+  <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

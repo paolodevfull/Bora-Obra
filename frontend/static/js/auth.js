@@ -1,35 +1,31 @@
 import { state } from './state.js';
 import { apiRequest } from './api.js';
 import { exibirNotificacao } from './ui.js';
-import { carregarRelatorioLucro, carregarLojas, carregarUsuarios, carregarProdutos, carregarPedidos } from './gestao.js';
-import { carregarLojasCliente } from './catalogo.js';
+import { carregarRelatorioLucro, carregarLojas, carregarUsuarios, carregarProdutos, carregarPedidos, renderizarPedidosDashboard } from './gestao.js';
+import { carregarLojasCliente, carregarDetalheProdutoPage, renderizarCarrinho } from './catalogo.js';
 import { carregarMeusPedidos } from './pedidos.js';
 import { obterEndereco, preencherEndereco } from './utils.js';
+import * as dashboard from './dashboard.js';
+import * as relatorios from './relatorios.js';
+import { clearFieldErrors, fieldError, validateRequired } from './validation.js';
+
+function atualizarTituloDaLoja(nomeLoja) {
+    const nome = String(nomeLoja || '').trim();
+    document.title = nome ? `Bora Obra - ${nome}` : 'Bora Obra';
+}
 
 export async function verificarSessaoAtiva() {
     try {
-        const res = await apiRequest('/api/auth/me', {}, [401]);
+        const res = await apiRequest('/api/auth/me', {}, [401, 403]);
         if (res.ok) {
             const usuario = await res.json();
             iniciarPainelPorTipo(usuario);
+        } else if (document.body.dataset.area !== 'auth') {
+            window.location.replace('/');
         }
     } catch (err) {
         exibirNotificacao(err.message || "Não foi possível carregar os dados.", true);
     }
-}
-
-export function mostrarCadastro(e) {
-    e.preventDefault();
-    document.getElementById('form-login-wrapper').classList.add('hidden');
-    document.getElementById('form-cadastro-wrapper').classList.remove('hidden');
-    esconderErroAuth();
-}
-
-export function mostrarLogin(e) {
-    e.preventDefault();
-    document.getElementById('form-cadastro-wrapper').classList.add('hidden');
-    document.getElementById('form-login-wrapper').classList.remove('hidden');
-    esconderErroAuth();
 }
 
 export function mostrarErroAuth(msg) {
@@ -39,17 +35,24 @@ export function mostrarErroAuth(msg) {
 }
 
 export function esconderErroAuth() {
-    document.getElementById('auth-erro').classList.add('hidden');
+    document.getElementById('auth-erro')?.classList.add('hidden');
 }
 
 export async function realizarLogin(e) {
     e.preventDefault();
     esconderErroAuth();
+    clearFieldErrors(e.currentTarget);
+
+    const email = document.getElementById('login-email');
+    const senha = document.getElementById('login-senha');
+    let valido = validateRequired(email, 'Informe seu e-mail.');
+    if (email.value && !email.validity.valid) valido = fieldError('login-email', 'Digite um e-mail válido.');
+    if (!validateRequired(senha, 'Informe sua senha.')) valido = false;
+    if (!valido) return;
 
     const dados = {
-        nome: document.getElementById('login-nome').value,
-        email: document.getElementById('login-email').value,
-        senha: document.getElementById('login-senha').value
+        email: email.value.trim(),
+        senha: senha.value
     };
 
     try {
@@ -71,13 +74,29 @@ export async function realizarLogin(e) {
 export async function realizarCadastro(e) {
     e.preventDefault();
     esconderErroAuth();
+    clearFieldErrors(e.currentTarget);
+
+    const nome = document.getElementById('cad-nome');
+    const email = document.getElementById('cad-email');
+    const senha = document.getElementById('cad-senha');
+    const confirmar = document.getElementById('cad-confirmar-senha');
+    let valido = validateRequired(nome, 'Informe seu nome completo.');
+    if (!validateRequired(email, 'Informe seu e-mail.')) valido = false;
+    else if (!email.validity.valid) valido = fieldError('cad-email', 'Digite um e-mail válido.');
+    if (senha.value.length < 6) valido = fieldError('cad-senha', 'A senha precisa ter pelo menos 6 caracteres.');
+    if (confirmar.value !== senha.value) valido = fieldError('cad-confirmar-senha', 'As senhas não coincidem.');
+    if (!document.getElementById('cad-termos').checked) {
+        mostrarErroAuth('Aceite os termos de uso e a política de privacidade para continuar.');
+        valido = false;
+    }
+    if (!valido) return;
 
     const dados = {
-        nome: document.getElementById('cad-nome').value,
-        email: document.getElementById('cad-email').value,
-        senha: document.getElementById('cad-senha').value,
+        nome: nome.value.trim(),
+        email: email.value.trim(),
+        telefone: document.getElementById('cad-telefone').value,
+        senha: senha.value,
         tipo: document.getElementById('cad-tipo').value,
-        ...obterEndereco('cad')
     };
 
     try {
@@ -93,7 +112,7 @@ export async function realizarCadastro(e) {
         const loginRes = await apiRequest('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome: dados.nome, email: dados.email, senha: dados.senha })
+            body: JSON.stringify({ email: dados.email, senha: dados.senha })
         });
         const loginResposta = await loginRes.json();
 
@@ -101,7 +120,9 @@ export async function realizarCadastro(e) {
 
         iniciarPainelPorTipo(loginResposta);
     } catch (err) {
-        mostrarErroAuth(err.message);
+        mostrarErroAuth(err.message.toLowerCase().includes('cadastr')
+            ? 'Não foi possível criar a conta com esses dados. Revise as informações ou use outro e-mail.'
+            : err.message);
     }
 }
 
@@ -117,67 +138,80 @@ export async function logoutUsuario() {
     state.carrinhoCliente = [];
     state.lojaAtualCliente = null;
 
-    document.getElementById('painel-lojista').classList.add('hidden');
-    document.getElementById('painel-cliente').classList.add('hidden');
-    document.getElementById('painel-entregador').classList.add('hidden');
-    document.getElementById('auth-screen').classList.remove('hidden');
-
-    document.getElementById('form-login').reset();
-    mostrarLogin({ preventDefault: () => {} });
+    window.location.replace('/');
 }
 
-export function iniciarPainelPorTipo(usuario) {
+export async function iniciarPainelPorTipo(usuario) {
     state.usuarioAtual = usuario;
-    document.getElementById('auth-screen').classList.add('hidden');
-
-    document.getElementById('painel-lojista').classList.add('hidden');
-    document.getElementById('painel-cliente').classList.add('hidden');
-    document.getElementById('painel-entregador').classList.add('hidden');
-
-    if (usuario.tipo === 'lojista' || usuario.tipo === 'funcionario') {
+    const area = document.body.dataset.area;
+    const pagina = document.body.dataset.page;
+    const areaUsuario = usuario.tipo === 'cliente' ? 'cliente' : ['lojista', 'funcionario'].includes(usuario.tipo) ? 'lojista' : 'auth';
+    if (area === 'auth') return window.location.replace(areaUsuario === 'cliente' ? '/cliente/index.html' : '/lojista/painel.html');
+    if (area !== areaUsuario) return window.location.replace(areaUsuario === 'cliente' ? '/cliente/index.html' : '/lojista/painel.html');
+    if (area === 'lojista') {
         state.perfilOperacional = usuario.tipo;
-        const ehFuncionario = usuario.tipo === 'funcionario';
-        if (ehFuncionario) {
-            document.getElementById('prod-loja-select').innerHTML = '<option value="0">Loja do seu responsável</option>';
-            document.getElementById('loja-operacional-select').innerHTML = '<option value="0">Loja vinculada</option>';
+        if (usuario.tipo === 'funcionario' && ['lojas', 'usuarios'].includes(pagina)) {
+            return window.location.replace('/lojista/painel.html');
         }
-        document.getElementById('painel-lojista').classList.remove('hidden');
-        document.getElementById('user-display-name').innerText = usuario.nome;
-        document.getElementById('menu-lojas').classList.toggle('hidden', ehFuncionario);
-        document.getElementById('menu-usuarios').classList.toggle('hidden', ehFuncionario);
-        carregarRelatorioLucro();
-        if (!ehFuncionario) {
-            carregarLojas();
-            carregarUsuarios();
+        document.querySelectorAll('[data-user-display-name]').forEach(elemento => {
+            elemento.textContent = usuario.nome;
+        });
+        document.querySelectorAll('[data-owner-only]').forEach(elemento => {
+            elemento.hidden = usuario.tipo !== 'lojista';
+        });
+        const seletorLoja = document.getElementById('loja-operacional-select');
+        if (seletorLoja) {
+            try {
+                const lojas = await apiRequest('/api/lojas').then(resposta => resposta.json());
+                seletorLoja.replaceChildren(...lojas.map(loja => new Option(loja.nome, loja.id)));
+                if (!lojas.length) seletorLoja.append(new Option('Nenhuma loja cadastrada', ''));
+                seletorLoja.closest('.store-switcher')?.classList.toggle('hidden', lojas.length <= 1);
+                atualizarTituloDaLoja(lojas[0]?.nome);
+                seletorLoja.addEventListener('change', () => {
+                    atualizarTituloDaLoja(seletorLoja.selectedOptions[0]?.textContent);
+                });
+            } catch {
+                seletorLoja.replaceChildren(new Option('Loja indisponível', ''));
+                atualizarTituloDaLoja();
+            }
         }
-        carregarProdutos();
-        carregarPedidos();
-    } else if (usuario.tipo === 'cliente') {
-        document.getElementById('painel-cliente').classList.remove('hidden');
-        document.getElementById('cliente-nome-display').innerText = usuario.nome;
-        document.getElementById('cliente-dashboard-nome').innerText = usuario.nome.split(' ')[0];
-        document.getElementById('carrinho-endereco').value = usuario.endereco || '';
-        carregarLojasCliente();
-        carregarMeusPedidos();
+        if (pagina === 'dashboard') {
+            const [produtos, pedidos] = await Promise.all([apiRequest('/api/produtos').then(r => r.json()), apiRequest('/api/pedidos').then(r => r.json())]);
+            state.cacheProdutos = produtos; state.cachePedidosLojista = pedidos;
+            renderizarPedidosDashboard(pedidos);
+            dashboard.renderDashboardLojista();
+        } else if (pagina === 'lojas') await carregarLojas();
+        else if (pagina === 'usuarios') await carregarUsuarios();
+        else if (pagina === 'produtos') { await carregarLojas(); await carregarProdutos(); }
+        else if (pagina === 'pedidos') await carregarPedidos();
+        else if (pagina === 'relatorios') await relatorios.carregarRelatorioFiltrado();
     } else {
-        document.getElementById('painel-entregador').classList.remove('hidden');
+        document.getElementById('cliente-nome-display').textContent = usuario.nome;
+        document.getElementById('cliente-dashboard-nome')?.replaceChildren(usuario.nome.split(' ')[0]);
+        const endereco = document.getElementById('carrinho-endereco'); if (endereco) endereco.value = usuario.endereco || '';
+        renderizarCarrinho();
+        if (pagina === 'catalogo') await carregarLojasCliente();
+        else if (pagina === 'detalhe-produto') await carregarDetalheProdutoPage(new URLSearchParams(location.search).get('produto'));
+        else if (pagina === 'perfil-cliente') {
+            document.getElementById('config-cliente-nome').value = usuario.nome || '';
+            document.getElementById('config-cliente-email').value = usuario.email || '';
+            preencherEndereco('config-cliente', usuario);
+        } else {
+            await carregarMeusPedidos();
+        }
     }
 }
 
-export function alternarMenuPerfilCliente() { document.getElementById('cliente-perfil-menu').classList.toggle('hidden'); }
-export function abrirConfiguracoesCliente() {
-    document.getElementById('cliente-perfil-menu').classList.add('hidden');
-    document.getElementById('config-cliente-nome').value = state.usuarioAtual.nome || '';
-    document.getElementById('config-cliente-email').value = state.usuarioAtual.email || '';
-    preencherEndereco('config-cliente', state.usuarioAtual);
-    document.getElementById('config-cliente-senha').value = '';
-    document.getElementById('cliente-config-modal').classList.remove('hidden');
+export function alternarMenuPerfilCliente() {
+    const menu = document.getElementById('cliente-perfil-menu');
+    const trigger = document.querySelector('.cliente-perfil-trigger');
+    const aberto = menu?.classList.toggle('hidden') === false;
+    trigger?.setAttribute('aria-expanded', String(aberto));
 }
-export function fecharConfiguracoesCliente() { document.getElementById('cliente-config-modal').classList.add('hidden'); }
 export async function salvarConfiguracoesCliente(e) {
     e.preventDefault();
     const dados = { nome: document.getElementById('config-cliente-nome').value, email: document.getElementById('config-cliente-email').value, senha: document.getElementById('config-cliente-senha').value, ...obterEndereco('config-cliente') };
-    try { const res = await apiRequest('/api/users/me', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) }); const usuario = await res.json(); if (!res.ok) throw new Error(usuario.erro || 'Não foi possível salvar.'); state.usuarioAtual = usuario; document.getElementById('cliente-nome-display').innerText = usuario.nome; document.getElementById('carrinho-endereco').value = usuario.endereco || ''; fecharConfiguracoesCliente(); exibirNotificacao('Configurações atualizadas!'); } catch (err) { exibirNotificacao(err.message, true); }
+    try { const res = await apiRequest('/api/users/me', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) }); const usuario = await res.json(); if (!res.ok) throw new Error(usuario.erro || 'Não foi possível salvar.'); state.usuarioAtual = usuario; document.getElementById('cliente-nome-display').innerText = usuario.nome; const endereco = document.getElementById('carrinho-endereco'); if (endereco) endereco.value = usuario.endereco || ''; exibirNotificacao('Configurações atualizadas!'); } catch (err) { exibirNotificacao(err.message, true); }
 }
 // ============ PAINEL LOJISTA ============
 

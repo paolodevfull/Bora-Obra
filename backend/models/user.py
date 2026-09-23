@@ -18,11 +18,13 @@ class User(db.Model):
     bairro = db.Column(db.String(100), nullable=True)
     cidade = db.Column(db.String(100), nullable=True)
     uf = db.Column(db.String(2), nullable=True)
+    telefone = db.Column(db.String(20), nullable=True)
+    ativo = db.Column(db.Boolean, nullable=False, default=True)
     def set_senha(self, senha): self.senha_hash = generate_password_hash(senha)
     def verificar_senha(self, senha): return check_password_hash(self.senha_hash, senha)
 
     def to_dict(self):
         return {campo: getattr(self, campo) for campo in (
             'id', 'nome', 'email', 'tipo', 'endereco', 'cep', 'logradouro', 'numero',
-            'complemento', 'bairro', 'cidade', 'uf'
+            'complemento', 'bairro', 'cidade', 'uf', 'telefone', 'ativo'
         )}

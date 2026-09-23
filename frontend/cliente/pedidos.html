@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pedidos · BoraObra</title>
+    <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml">
+    <script src="/static/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/static/css/tokens.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260922-9">
+</head>
+
+<body class="bg-dark" data-area="cliente" data-page="pedidos-cliente">
+    <div id="notifications" class="notifications" aria-live="polite"></div>
+    <div id="app-shell"></div>
+    <main id="static-page-content" class="static-page-content">
+        <section id="cliente-tab-pedidos" class="cliente-section active">
+            <header class="section-header">
+                <div><span class="eyebrow">Compras e locações</span>
+                    <h2>Pedidos</h2>
+                    <p>Revise seu carrinho, confirme a compra e acompanhe cada etapa.</p>
+                </div>
+                <div><button class="btn-secondary" type="button" data-action="cliente-catalogo"><i
+                            class="fa-solid fa-arrow-left"></i> Catálogo</button> <button class="btn-secondary"
+                        type="button" data-action="pedidos-atualizar"><i class="fa-solid fa-arrows-rotate"></i>
+                        Atualizar</button></div>
+            </header>
+            <section id="checkout-panel" class="order-checkout" aria-labelledby="checkout-title">
+                <header>
+                    <div><span class="eyebrow">Revise antes de confirmar</span>
+                        <h3 id="checkout-title">Seu carrinho</h3>
+                    </div><i class="fa-solid fa-cart-shopping"></i>
+                </header>
+                <ol class="checkout-steps checkout-steps-horizontal">
+                    <li class="complete"><span>1</span>
+                        <div><strong>Identificação</strong><small>Conta autenticada</small></div>
+                    </li>
+                    <li id="checkout-step-review"><span>2</span>
+                        <div><strong>Produtos</strong><small id="checkout-loja">Escolha um produto</small></div>
+                    </li>
+                    <li id="checkout-step-dates"><span>3</span>
+                        <div><strong>Datas</strong><small>Definidas ao alugar</small></div>
+                    </li>
+                    <li id="checkout-step-delivery"><span>4</span>
+                        <div><strong>Entrega</strong><small>Informe seu endereço</small></div>
+                    </li>
+                    <li><span>5</span>
+                        <div><strong>Confirmação</strong><small>Ticket automático</small></div>
+                    </li>
+                </ol>
+                <div class="order-checkout-grid">
+                    <div id="carrinho-itens" class="cart-lines">
+                        <div class="cart-empty"><i class="fa-solid fa-cart-shopping"></i>
+                            <p>Seu carrinho está vazio</p><small>Escolha um equipamento no catálogo.</small>
+                        </div>
+                    </div>
+                    <div class="order-checkout-form"><label>Endereço de entrega<input id="carrinho-endereco" type="text"
+                                autocomplete="street-address"
+                                placeholder="Rua, número, bairro"></label><label>Pagamento<select
+                                id="carrinho-forma-pagamento">
+                                <option>Pix</option>
+                                <option>Cartão de crédito</option>
+                                <option>Cartão de débito</option>
+                                <option>Dinheiro</option>
+                            </select></label>
+                        <div class="checkout-total"><span>Total</span><strong id="carrinho-total-display">R$
+                                0,00</strong></div><button id="checkout-submit" class="btn-primary" type="button"
+                            data-action="checkout"><i class="fa-solid fa-lock"></i> Confirmar pedido</button>
+                    </div>
+                </div>
+            </section>
+            <div class="account-summary">
+                <div><i class="fa-solid fa-receipt"></i><span><small>Pedidos</small><strong
+                            id="cliente-total-pedidos">0</strong></span></div>
+                <div><i class="fa-solid fa-cart-shopping"></i><span><small>Compras</small><strong
+                            id="cliente-total-compras">0</strong></span></div>
+                <div><i class="fa-solid fa-clock-rotate-left"></i><span><small>Locações ativas</small><strong
+                            id="cliente-locacoes-ativas">0</strong></span></div>
+            </div>
+            <div class="orders-history-heading">
+                <div><span class="eyebrow">Histórico</span>
+                    <h3>Seus pedidos</h3>
+                </div><span id="pedidos-lista-status" role="status" aria-live="polite">Carregando...</span>
+            </div>
+            <div id="cliente-pedidos-lista" class="customer-orders-list" aria-live="polite">
+                <div class="orders-skeleton"></div>
+                <div class="orders-skeleton"></div>
+            </div>
+        </section>
+    </main>
+    <div id="shared-modals"></div>
+    <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

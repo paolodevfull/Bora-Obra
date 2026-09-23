@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Funcionários · BoraObra</title>
+  <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+  <script src="/static/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="lojista" data-page="usuarios">
+  <div id="notifications" class="notifications" aria-live="polite"></div>
+  <div id="app-shell"></div>
+  <main id="static-page-content" class="static-page-content">
+    <section id="tab-usuarios" class="content-section active">
+      <header class="section-header">
+        <div>
+          <h2>Gestão de funcionários</h2>
+          <p>Cadastre e acompanhe somente os funcionários da sua loja.</p>
+        </div>
+      </header>
+      <div class="grid-2col">
+        <div class="form-card">
+          <h3>Cadastrar funcionário</h3>
+          <form id="form-cad-user">
+            <input type="hidden" id="user-edit-id" />
+            <div class="input-group">
+              <label>Nome completo</label>
+              <input type="text" id="user-nome" maxlength="100" required placeholder="Ex: João da Silva" />
+            </div>
+            <div class="input-group">
+              <label>E-mail</label>
+              <input type="email" id="user-email" required placeholder="joao@email.com" />
+            </div>
+            <div class="input-group">
+              <label>Telefone</label><input type="tel" id="user-telefone" maxlength="15"
+                placeholder="(31) 99999-9999" />
+            </div>
+            <div class="input-group">
+              <label>Senha provisória</label>
+              <input type="password" id="user-senha" required minlength="6" placeholder="Mínimo 6 caracteres" />
+            </div>
+            <div class="input-group">
+              <label>Confirmar senha</label><input type="password" id="user-confirmar-senha" required minlength="6"
+                placeholder="Repita a senha" />
+            </div>
+            <label class="check-filter"><input type="checkbox" id="user-ativo" checked /><span></span>Conta
+              ativa</label>
+            <button type="button" class="field-link" data-action="usuario-senha-toggle">
+              <i class="fa-regular fa-eye"></i> Mostrar senhas
+            </button>
+            <div class="input-group">
+              <label>Tipo de conta</label>
+              <select id="user-tipo">
+                <option value="funcionario">Funcionário</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary">
+              Cadastrar funcionário
+            </button>
+          </form>
+        </div>
+        <div class="table-card">
+          <div class="management-toolbar">
+            <label><i class="fa-solid fa-magnifying-glass"></i><input id="filtro-usuarios-busca" type="search"
+                placeholder="Buscar funcionário" aria-label="Buscar funcionário" /></label><select
+              id="filtro-usuarios-status" aria-label="Filtrar funcionários por status">
+              <option value="">Todos os status</option>
+              <option value="ativo">Ativos</option>
+              <option value="inativo">Inativos</option>
+            </select><select id="ordenar-usuarios" aria-label="Ordenar funcionários">
+              <option value="nome">Nome A–Z</option>
+              <option value="recentes">Mais recentes</option>
+            </select>
+          </div>
+          <h3>Funcionários cadastrados</h3>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Telefone</th>
+                  <th>Perfil</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-usuarios"></tbody>
+            </table>
+            <div id="paginacao-usuarios" class="pagination-bar"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="shared-modals"></div>
+  <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

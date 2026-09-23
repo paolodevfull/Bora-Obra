@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Produtos · BoraObra</title>
+    <link
+      rel="icon"
+      href="/static/img/favicon.svg?v=20260922"
+      type="image/svg+xml"
+    />
+    <script src="/static/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/static/css/tokens.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+  </head>
+  <body class="bg-dark" data-area="lojista" data-page="produtos">
+    <div id="notifications" class="notifications" aria-live="polite"></div>
+    <div id="app-shell"></div>
+    <main id="static-page-content" class="static-page-content">
+      <section id="tab-produtos" class="content-section active">
+        <header class="section-header">
+          <div>
+            <h2>Anúncios e estoque</h2>
+            <p>Ative, pause e edite os produtos publicados no marketplace.</p>
+          </div>
+        </header>
+        <div class="grid-2col">
+          <div class="form-card">
+            <h3>Cadastrar produto</h3>
+            <form id="form-cad-prod">
+              <div class="input-group">
+                <label>Loja responsável</label>
+                <select id="prod-loja-select" required>
+                  <option value="">Carregando lojas...</option>
+                </select>
+              </div>
+              <div class="grid-inputs">
+                <div class="input-group">
+                  <label>Código do produto <small>(opcional)</small></label
+                  ><input
+                    id="prod-sku"
+                    maxlength="60"
+                    placeholder="Ex.: BET-400-220"
+                  /><small class="field-help"
+                    >Use o código que você já utiliza no estoque.</small
+                  >
+                </div>
+                <div class="input-group">
+                  <label>Endereço da imagem <small>(opcional)</small></label
+                  ><input
+                    type="url"
+                    id="prod-imagem-url"
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+              <div class="grid-inputs">
+                <div class="input-group">
+                  <label>Estoque</label
+                  ><input
+                    type="number"
+                    id="prod-estoque"
+                    min="0"
+                    step="1"
+                    value="0"
+                    required
+                  />
+                </div>
+                <div class="input-group">
+                  <label>Unidade</label
+                  ><select id="prod-unidade">
+                    <option value="un">Unidade</option>
+                    <option value="kit">Kit</option>
+                    <option value="m">Metro</option>
+                    <option value="kg">Quilograma</option>
+                  </select>
+                </div>
+              </div>
+              <div class="input-group">
+                <label>Nome do produto</label>
+                <input
+                  type="text"
+                  id="prod-nome"
+                  placeholder="Ex: Betoneira 400L"
+                  required
+                />
+              </div>
+              <div class="grid-inputs">
+                <div class="input-group">
+                  <label>Categoria</label>
+                  <input
+                    type="text"
+                    id="prod-categoria"
+                    placeholder="Maquinário"
+                  />
+                </div>
+                <div class="input-group">
+                  <label>Utilidade / etapa</label>
+                  <input
+                    type="text"
+                    id="prod-utilidade"
+                    placeholder="Concretagem"
+                  />
+                </div>
+              </div>
+              <div class="grid-inputs">
+                <div class="input-group">
+                  <label>Cor / Tamanho</label>
+                  <input
+                    type="text"
+                    id="prod-cor-tamanho"
+                    placeholder="Ex: Amarela / 220V"
+                  />
+                </div>
+                <div class="input-group">
+                  <label>Descrição</label>
+                  <input
+                    type="text"
+                    id="prod-descricao"
+                    placeholder="Detalhes adicionais"
+                  />
+                </div>
+              </div>
+              <div class="grid-inputs">
+                <div class="input-group">
+                  <label>Preço venda (R$)</label>
+                  <input
+                    type="number"
+                    min="0.01"
+                    max="1000000000"
+                    step="0.01"
+                    inputmode="decimal"
+                    id="prod-preco-venda"
+                    required
+                  />
+                </div>
+                <div class="input-group">
+                  <label>Preço locação (R$)</label>
+                  <input
+                    type="number"
+                    min="0.01"
+                    max="1000000000"
+                    step="0.01"
+                    inputmode="decimal"
+                    id="prod-preco-locacao"
+                    required
+                  />
+                </div>
+              </div>
+              <fieldset class="availability-fields">
+                <legend>Como este produto será oferecido?</legend>
+                <label
+                  ><input type="checkbox" id="prod-disponivel_venda" checked />
+                  Disponível para venda</label
+                ><label
+                  ><input
+                    type="checkbox"
+                    id="prod-disponivel_locacao"
+                    checked
+                  />
+                  Disponível para locação</label
+                ><label
+                  ><input type="checkbox" id="prod-status_manutencao" /> Está em
+                  manutenção</label
+                ><label
+                  ><input type="checkbox" id="prod-classificacao_curva_a" />
+                  Produto de alta procura</label
+                >
+              </fieldset>
+              <button type="submit" class="btn-primary">Salvar produto</button>
+            </form>
+          </div>
+          <div class="table-card">
+            <div class="management-toolbar">
+              <label
+                ><i class="fa-solid fa-magnifying-glass"></i
+                ><input
+                  id="filtro-produtos-busca"
+                  type="search"
+                  placeholder="Buscar produto ou SKU"
+                  aria-label="Buscar produto ou SKU" /></label
+              ><select
+                id="filtro-produtos-status"
+                aria-label="Filtrar produtos por status"
+              >
+                <option value="">Todos</option>
+                <option value="ativo">Ativos</option>
+                <option value="inativo">Inativos</option></select
+              ><select
+                id="ordenar-produtos-gestao"
+                aria-label="Ordenar produtos"
+              >
+                <option value="nome">Nome A–Z</option>
+                <option value="estoque">Menor estoque</option>
+                <option value="recentes">Mais recentes</option>
+              </select>
+            </div>
+            <h3>Seus anúncios</h3>
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Anúncio</th>
+                    <th>Detalhes</th>
+                    <th>Preço</th>
+                    <th>Disponibilidade</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-produtos"></tbody>
+              </table>
+              <div id="paginacao-produtos" class="pagination-bar"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div
+        id="produto-edit-modal"
+        class="modal-overlay hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="produto-edit-title"
+      >
+        <div class="form-card edit-modal-card">
+          <h3 id="produto-edit-title">Editar produto</h3>
+          <form id="form-editar-produto">
+            <input type="hidden" id="edit-prod-id" />
+            <div class="input-group">
+              <label>Nome do produto</label>
+              <input type="text" id="edit-prod-nome" required />
+            </div>
+            <div class="grid-inputs">
+              <div class="input-group">
+                <label>SKU</label><input id="edit-prod-sku" maxlength="60" />
+              </div>
+              <div class="input-group">
+                <label>Imagem (URL)</label
+                ><input type="url" id="edit-prod-imagem-url" />
+              </div>
+            </div>
+            <div class="grid-inputs">
+              <div class="input-group">
+                <label>Estoque</label
+                ><input type="number" id="edit-prod-estoque" min="0" required />
+              </div>
+              <div class="input-group">
+                <label>Unidade</label
+                ><select id="edit-prod-unidade">
+                  <option value="un">Unidade</option>
+                  <option value="kit">Kit</option>
+                  <option value="m">Metro</option>
+                  <option value="kg">Quilograma</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid-inputs">
+              <div class="input-group">
+                <label>Categoria</label>
+                <input type="text" id="edit-prod-categoria" />
+              </div>
+              <div class="input-group">
+                <label>Utilidade / etapa</label>
+                <input type="text" id="edit-prod-utilidade" />
+              </div>
+            </div>
+            <div class="grid-inputs">
+              <div class="input-group">
+                <label>Cor / Tamanho</label>
+                <input type="text" id="edit-prod-cor-tamanho" />
+              </div>
+              <div class="input-group">
+                <label>Descrição</label>
+                <input type="text" id="edit-prod-descricao" />
+              </div>
+            </div>
+            <div class="grid-inputs">
+              <div class="input-group">
+                <label>Preço venda (R$)</label>
+                <input
+                  type="number"
+                  min="0.01"
+                  max="1000000000"
+                  step="0.01"
+                  inputmode="decimal"
+                  id="edit-prod-preco-venda"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label>Preço locação (R$)</label>
+                <input
+                  type="number"
+                  min="0.01"
+                  max="1000000000"
+                  step="0.01"
+                  inputmode="decimal"
+                  id="edit-prod-preco-locacao"
+                  required
+                />
+              </div>
+            </div>
+            <fieldset class="availability-fields">
+              <legend>Como este produto será oferecido?</legend>
+              <label
+                ><input
+                  type="checkbox"
+                  id="edit-prod-disponivel_venda"
+                  checked
+                />
+                Disponível para venda</label
+              ><label
+                ><input
+                  type="checkbox"
+                  id="edit-prod-disponivel_locacao"
+                  checked
+                />
+                Disponível para locação</label
+              ><label
+                ><input type="checkbox" id="edit-prod-status_manutencao" /> Está
+                em manutenção</label
+              ><label
+                ><input type="checkbox" id="edit-prod-classificacao_curva_a" />
+                Produto de alta procura</label
+              >
+            </fieldset>
+            <div class="grid-inputs">
+              <button
+                type="button"
+                class="btn-secondary"
+                data-action="produto-edicao-fechar"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-primary">
+                Salvar alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+    <div id="shared-modals"></div>
+    <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+  </body>
+</html>

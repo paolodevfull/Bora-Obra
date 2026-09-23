@@ -15,6 +15,12 @@ class Loja(db.Model):
     cidade = db.Column(db.String(100), nullable=True)
     uf = db.Column(db.String(2), nullable=True)
     telefone = db.Column(db.String(20))
+    responsavel_nome = db.Column(db.String(100))
+    documento = db.Column(db.String(18))
+    email = db.Column(db.String(120))
+    logo_url = db.Column(db.String(500))
+    logo_marcador_url = db.Column(db.String(500))
+    ativa = db.Column(db.Boolean, nullable=False, default=True)
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
     lojista_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True, nullable=True)
@@ -32,6 +38,28 @@ class Loja(db.Model):
             "cidade": self.cidade,
             "uf": self.uf,
             "telefone": self.telefone,
+            "responsavel_nome": self.responsavel_nome,
+            "documento": self.documento,
+            "email": self.email,
+            "logo_url": self.logo_url,
+            "logo_marcador_url": self.logo_marcador_url,
+            "ativa": self.ativa,
             "latitude": self.latitude,
             "longitude": self.longitude
+        }
+
+    def to_public_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "endereco": self.endereco,
+            "cep": self.cep,
+            "cidade": self.cidade,
+            "uf": self.uf,
+            "telefone": self.telefone,
+            "logo_url": self.logo_url,
+            "logo_marcador_url": self.logo_marcador_url,
+            "ativa": self.ativa,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
         }

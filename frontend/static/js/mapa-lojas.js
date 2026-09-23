@@ -1,4 +1,7 @@
+import { escapeHtml } from './ui.js';
+
 const BRASIL = [-14.235, -51.9253];
+const LOGO_PADRAO = '/static/img/store-default.svg';
 let mapa;
 let camadaLojas;
 let marcadorCliente;
@@ -6,8 +9,8 @@ let circuloPrecisao;
 let watchId;
 let lojas = [];
 let raioKm = 25;
-let onUpdate = () => {};
-let onSelect = () => {};
+let onUpdate = () => { };
+let onSelect = () => { };
 
 export function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
     const rad = valor => valor * Math.PI / 180;
@@ -24,16 +27,38 @@ function status(texto, tipo = '') {
     elemento.dataset.tipo = tipo;
 }
 
-function criarIconeLoja(selecionada = false) {
+function urlLogoSegura(loja) {
+    const valor = loja?.logo_marcador_url || loja?.logo_url || LOGO_PADRAO;
+    try {
+        const url = new URL(valor, window.location.origin);
+        if (url.origin === window.location.origin || url.protocol === 'https:') return url.href;
+    } catch (_) { }
+    return new URL(LOGO_PADRAO, window.location.origin).href;
+}
+
+function criarIconeLoja(loja, selecionada = false) {
+    const nome = escapeHtml(loja?.nome || 'Loja');
+    const logo = escapeHtml(urlLogoSegura(loja));
     return globalThis.L.divIcon({
         className: '',
-        html: `<span class="store-map-pin${selecionada ? ' selected' : ''}"><i class="fa-solid fa-store"></i></span>`,
+        html: `<span class="store-map-pin${selecionada ? ' selected' : ''}" role="img" aria-label="Localização de ${nome}"><span class="store-map-pin-logo"><img src="${logo}" alt=""></span></span>`,
         iconSize: [38, 44], iconAnchor: [19, 42], popupAnchor: [0, -38]
     });
 }
 
+export function coordenadasValidas(loja) {
+    if (loja?.latitude === null || loja?.latitude === undefined || loja?.latitude === ''
+        || loja?.longitude === null || loja?.longitude === undefined || loja?.longitude === '') return false;
+    const latitude = Number(loja.latitude);
+    const longitude = Number(loja.longitude);
+    return Number.isFinite(latitude) && Number.isFinite(longitude)
+        && latitude >= -90 && latitude <= 90
+        && longitude >= -180 && longitude <= 180
+        && !(latitude === 0 && longitude === 0);
+}
+
 function lojasComCoordenadas() {
-    return lojas.filter(loja => Number.isFinite(Number(loja.latitude)) && Number.isFinite(Number(loja.longitude)));
+    return lojas.filter(coordenadasValidas);
 }
 
 function desenharLojas(lista = lojasComCoordenadas()) {
@@ -51,8 +76,16 @@ function desenharLojas(lista = lojasComCoordenadas()) {
             distancia.textContent = `${loja.distancia_km.toFixed(1).replace('.', ',')} km`;
             popup.append(document.createElement('br'), distancia);
         }
-        const marker = globalThis.L.marker([Number(loja.latitude), Number(loja.longitude)], { icon: criarIconeLoja() })
+        const marker = globalThis.L.marker([Number(loja.latitude), Number(loja.longitude)], {
+            icon: criarIconeLoja(loja), keyboard: true, title: `Loja ${loja.nome}`
+        })
             .bindPopup(popup);
+        marker.on('add', () => {
+            const imagem = marker.getElement()?.querySelector('.store-map-pin-logo img');
+            imagem?.addEventListener('error', () => {
+                imagem.src = LOGO_PADRAO;
+            }, { once: true });
+        });
         marker.on('click', () => onSelect(loja.id));
         marker.addTo(camadaLojas);
     });
@@ -66,10 +99,10 @@ function atualizarPorPosicao(position) {
         .sort((a, b) => a.distancia_km - b.distancia_km);
 
     if (marcadorCliente) marcadorCliente.setLatLng([latitude, longitude]);
-    else marcadorCliente = globalThis.L.circleMarker([latitude, longitude], { radius: 8, color: '#fff', weight: 3, fillColor: '#2563eb', fillOpacity: 1 })
+    else marcadorCliente = globalThis.L.circleMarker([latitude, longitude], { radius: 8, className: 'client-location-marker', weight: 3, fillOpacity: 1 })
         .bindPopup('Você está aqui').addTo(mapa);
     if (circuloPrecisao) circuloPrecisao.setLatLng([latitude, longitude]).setRadius(accuracy);
-    else circuloPrecisao = globalThis.L.circle([latitude, longitude], { radius: accuracy, color: '#2563eb', weight: 1, fillOpacity: .07 }).addTo(mapa);
+    else circuloPrecisao = globalThis.L.circle([latitude, longitude], { radius: accuracy, className: 'client-location-accuracy', weight: 1, fillOpacity: .07 }).addTo(mapa);
 
     desenharLojas(ordenadas);
     mapa.setView([latitude, longitude], raioKm <= 10 ? 12 : raioKm <= 25 ? 11 : 10);
@@ -122,14 +155,18 @@ export function inicializarMapaLojas(opcoes) {
         }).addTo(mapa);
         camadaLojas = globalThis.L.layerGroup().addTo(mapa);
     }
-    desenharLojas();
+    const geolocalizadas = lojasComCoordenadas();
+    desenharLojas(geolocalizadas);
+    if (!geolocalizadas.length && lojas.length) {
+        status('As lojas cadastradas ainda não possuem coordenadas válidas. Edite e salve o endereço da loja para posicioná-la no mapa.', 'vazio');
+    }
     setTimeout(() => mapa.invalidateSize(), 0);
     onUpdate(lojas, false);
 
     try {
         navigator.permissions?.query({ name: 'geolocation' }).then(resultado => {
             if (resultado.state === 'granted') ativarLocalizacao();
-        }).catch(() => {});
+        }).catch(() => { });
     } catch (_) {
         // Alguns navegadores oferecem geolocalização, mas não a Permissions API.
     }

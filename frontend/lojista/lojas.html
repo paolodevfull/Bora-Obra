@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Minha loja · BoraObra</title>
+  <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+  <script src="/static/js/theme-init.js"></script>
+  <link rel="stylesheet" href="/static/css/tokens.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="lojista" data-page="lojas">
+  <div id="notifications" class="notifications" aria-live="polite"></div>
+  <div id="app-shell"></div>
+  <main id="static-page-content" class="static-page-content">
+    <section id="tab-lojas" class="content-section active">
+      <header class="section-header">
+        <div>
+          <h2>Minha loja</h2>
+          <p>Consulte e mantenha os dados da sua única loja.</p>
+        </div>
+      </header>
+      <section class="theme-settings" aria-labelledby="tema-loja-titulo">
+        <div>
+          <span class="eyebrow">Aparência</span>
+          <h3 id="tema-loja-titulo">Tema da interface</h3>
+          <p>Escolha a opção mais confortável para trabalhar.</p>
+        </div>
+        <div class="theme-choice" role="radiogroup" aria-label="Tema da interface">
+          <button type="button" role="radio" data-action="tema-selecionar" data-theme="light">
+            <i class="fa-solid fa-sun"></i><span><strong>Claro</strong><small>Neutro e suave</small></span>
+          </button>
+          <button type="button" role="radio" data-action="tema-selecionar" data-theme="dark">
+            <i class="fa-solid fa-moon"></i><span><strong>Escuro</strong><small>Menos brilho</small></span>
+          </button>
+          <button type="button" role="radio" data-action="tema-selecionar" data-theme="system">
+            <i class="fa-solid fa-display"></i><span><strong>Sistema</strong><small>Segue o dispositivo</small></span>
+          </button>
+        </div>
+      </section>
+      <div class="grid-2col store-settings-layout">
+        <div class="form-card store-settings-form">
+          <h3 id="loja-form-titulo">Minha loja</h3>
+          <div id="loja-resumo" class="loja-resumo hidden">
+            <div class="store-logo-summary">
+              <img id="loja-resumo-logo" src="/static/img/store-default.svg" alt="Logotipo da loja" />
+            </div>
+            <div class="loja-info-item">
+              <span>Nome da loja</span>
+              <strong id="loja-resumo-nome">-</strong>
+            </div>
+            <div class="loja-info-item">
+              <span>Endereço</span>
+              <strong id="loja-resumo-endereco">-</strong>
+            </div>
+            <div class="loja-info-item">
+              <span>Telefone / WhatsApp</span>
+              <strong id="loja-resumo-telefone">-</strong>
+            </div>
+            <button type="button" class="btn-primary" data-action="loja-editar">
+              <i class="fa-solid fa-gear"></i> Editar configurações
+            </button>
+          </div>
+          <form id="form-cad-loja">
+            <div class="grid-inputs">
+              <div class="input-group">
+                <label>Responsável</label><input id="loja-responsavel" required maxlength="100"
+                  placeholder="Nome completo" />
+              </div>
+              <div class="input-group">
+                <label>CNPJ ou CPF</label><input id="loja-documento" maxlength="18" placeholder="00.000.000/0000-00" />
+              </div>
+            </div>
+            <div class="input-group">
+              <label>E-mail comercial</label><input type="email" id="loja-email" placeholder="contato@loja.com" />
+            </div>
+            <fieldset class="store-logo-fieldset">
+              <legend>Logotipo da loja</legend>
+              <div id="loja-logo-dropzone" class="store-logo-dropzone" tabindex="0" role="button"
+                aria-describedby="loja-logo-ajuda" data-action="loja-logo-escolher">
+                <img id="loja-logo-preview" src="/static/img/store-default.svg" alt="Pré-visualização do logotipo" />
+                <div>
+                  <strong>Arraste a imagem ou selecione um arquivo</strong><small id="loja-logo-ajuda">PNG, JPEG ou WebP
+                    · até 2 MB · mínimo 48 × 48 px</small>
+                </div>
+              </div>
+              <input class="visually-hidden" type="file" id="loja-logo-arquivo"
+                accept="image/png,image/jpeg,image/webp" />
+              <div class="store-logo-actions">
+                <button class="btn-secondary" type="button" data-action="loja-logo-escolher">
+                  <i class="fa-solid fa-image"></i> Selecionar imagem</button><button id="loja-logo-remover"
+                  class="btn-remove-item" type="button" data-action="loja-logo-remover">
+                  <i class="fa-solid fa-trash"></i> Remover logotipo
+                </button>
+              </div>
+              <small id="loja-logo-status" class="field-help" aria-live="polite">A imagem será otimizada automaticamente
+                para o catálogo e o
+                mapa.</small>
+            </fieldset>
+            <div class="input-group">
+              <label>Nome da loja / depósito</label>
+              <input type="text" id="loja-nome" maxlength="100" required placeholder="Ex: BoraObra Centro" />
+            </div>
+            <div class="input-group">
+              <label>Telefone / WhatsApp</label>
+              <input type="tel" id="loja-telefone" autocomplete="tel" inputmode="tel" maxlength="15"
+                placeholder="(31) 99999-9999" />
+            </div>
+            <label class="check-filter"><input type="checkbox" id="loja-ativa" checked /><span></span>Loja ativa no
+              marketplace</label>
+            <fieldset class="address-fieldset">
+              <legend>Endereço da loja</legend>
+              <div class="address-grid">
+                <div class="input-group compact cep-field">
+                  <label>CEP</label><input id="loja-cep" inputmode="numeric" autocomplete="postal-code" maxlength="9"
+                    placeholder="00000-000" required /><small id="loja-cep-status" class="cep-status"
+                    aria-live="polite"></small>
+                </div>
+                <div class="input-group compact street-field">
+                  <label>Logradouro</label><input id="loja-logradouro" autocomplete="address-line1"
+                    placeholder="Rua ou avenida" required />
+                </div>
+                <div class="input-group compact">
+                  <label>Número</label><input id="loja-numero" maxlength="20" placeholder="123, 123-A ou S/N"
+                    required />
+                </div>
+                <div class="input-group compact">
+                  <label>Complemento</label><input id="loja-complemento" placeholder="Sala, galpão..." />
+                </div>
+                <div class="input-group compact">
+                  <label>Bairro</label><input id="loja-bairro" placeholder="Bairro" required />
+                </div>
+                <div class="input-group compact">
+                  <label>Cidade</label><input id="loja-cidade" autocomplete="address-level2" placeholder="Cidade"
+                    required />
+                </div>
+                <div class="input-group compact uf-field">
+                  <label>UF</label><input id="loja-uf" autocomplete="address-level1" maxlength="2" placeholder="SP"
+                    required />
+                </div>
+              </div>
+              <small class="field-help"><i class="fa-solid fa-location-dot"></i> Um endereço completo
+                melhora a precisão no mapa de lojas próximas.</small>
+            </fieldset>
+            <button type="submit" class="btn-primary" id="loja-form-submit">
+              Cadastrar minha loja
+            </button>
+          </form>
+        </div>
+        <div class="table-card store-settings-table">
+          <h3>Dados cadastrados</h3>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Responsável</th>
+                  <th>Endereço</th>
+                  <th>Telefone</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-lojas"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="shared-modals"></div>
+  <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

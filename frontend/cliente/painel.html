@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Minha conta · BoraObra</title>
+    <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml">
+    <script src="/static/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/static/css/tokens.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260922-9">
+</head>
+
+<body class="bg-dark" data-area="cliente" data-page="dashboard-cliente">
+    <div id="notifications" class="notifications" aria-live="polite"></div>
+    <div id="app-shell"></div>
+    <main id="static-page-content" class="static-page-content">
+        <section id="cliente-tab-dashboard" class="cliente-section active">
+            <header class="section-header client-dashboard-header">
+                <div><span class="eyebrow">Sua conta</span>
+                    <h2>Olá, <span id="cliente-dashboard-nome">cliente</span></h2>
+                    <p>Acompanhe seus pedidos, gastos e locações em um só lugar.</p>
+                </div>
+                <div class="header-actions"><label class="period-filter">Período<select id="periodo-dashboard-cliente">
+                            <option value="hoje">Hoje</option>
+                            <option value="7d">Últimos 7 dias</option>
+                            <option value="30d" selected>Últimos 30 dias</option>
+                            <option value="mes">Este mês</option>
+                            <option value="personalizado">Personalizado</option>
+                        </select></label><button class="btn-secondary" type="button" data-action="dashboard-recarregar"
+                        data-profile="cliente"><i class="fa-solid fa-arrows-rotate"></i> Atualizar</button></div>
+            </header>
+            <div id="periodo-personalizado-cliente" class="custom-period hidden"><label>De<input
+                        id="periodo-inicio-cliente" type="date"></label><label>Até<input id="periodo-fim-cliente"
+                        type="date"></label><button class="btn-secondary" type="button"
+                    data-action="dashboard-periodo-aplicar" data-profile="cliente">Aplicar</button></div>
+            <div id="cliente-dashboard-kpis" class="dashboard-kpis"></div>
+            <div id="dashboard-charts-cliente" class="dashboard-charts" aria-live="polite">
+                <article class="chart-card chart-wide">
+                    <header>
+                        <div><span class="eyebrow">Histórico</span>
+                            <h3>Gastos ao longo do tempo</h3>
+                        </div>
+                    </header>
+                    <div class="chart-frame"><canvas id="chart-cliente-gastos" aria-label="Gastos ao longo do tempo"
+                            role="img"></canvas>
+                        <div class="chart-state hidden"></div>
+                    </div>
+                </article>
+                <article class="chart-card">
+                    <header>
+                        <div><span class="eyebrow">Modalidades</span>
+                            <h3>Compras versus locações</h3>
+                        </div>
+                    </header>
+                    <div class="chart-frame"><canvas id="chart-cliente-modalidades" aria-label="Compras versus locações"
+                            role="img"></canvas>
+                        <div class="chart-state hidden"></div>
+                    </div>
+                </article>
+            </div>
+            <div class="dashboard-recent">
+                <header>
+                    <h3>Pedidos recentes</h3><button class="btn-secondary" type="button"
+                        data-action="cliente-pedidos">Ver todos</button>
+                </header>
+                <div id="cliente-dashboard-recentes"></div>
+            </div>
+        </section>
+    </main>
+    <div id="shared-modals"></div>
+    <script defer src="/static/vendor/chart.umd.min.js"></script>
+    <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

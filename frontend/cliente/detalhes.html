@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Detalhes do produto · BoraObra</title>
+    <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml" />
+    <script src="/static/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/static/css/tokens.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+</head>
+
+<body class="bg-dark" data-area="cliente" data-page="detalhe-produto">
+    <div id="notifications" class="notifications" aria-live="polite"></div>
+    <div id="app-shell"></div>
+    <main id="static-page-content">
+        <section id="cliente-produto-detalhe" class="produto-detalhe" aria-labelledby="detalhe-nome">
+            <nav class="breadcrumb" aria-label="Navegação estrutural">
+                <a href="/cliente/index.html">Produtos</a><i class="fa-solid fa-chevron-right"></i><span
+                    id="detalhe-breadcrumb-categoria">Produto</span>
+            </nav>
+            <a class="btn-back" href="/cliente/index.html"><i class="fa-solid fa-arrow-left"></i> Voltar aos
+                produtos</a>
+            <div class="produto-detalhe-layout">
+                <div class="produto-imagem-placeholder" role="img" aria-label="Imagem ilustrativa do produto">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <div class="produto-detalhe-info">
+                    <small id="detalhe-categoria"></small>
+                    <h1 id="detalhe-nome">Carregando produto...</h1>
+                    <p id="detalhe-utilidade"></p>
+                    <div id="detalhe-loja" class="detail-store"></div>
+                    <fieldset class="detail-operation">
+                        <legend>Como você quer este equipamento?</legend>
+                        <div class="operation-toggle">
+                            <button type="button" data-action="operacao" data-operation="Venda" aria-pressed="false">
+                                <i class="fa-solid fa-cart-shopping"></i> Comprar</button><button type="button"
+                                data-action="operacao" data-operation="Locacao" aria-pressed="false">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Alugar
+                            </button>
+                        </div>
+                        <small id="detalhe-operacao-ajuda"></small>
+                    </fieldset>
+                    <div id="checkout-datas" class="checkout-dates detail-rental-period hidden">
+                        <strong><i class="fa-regular fa-calendar"></i> Período da
+                            locação</strong>
+                        <p>
+                            Escolha a retirada e a devolução antes de adicionar o
+                            equipamento.
+                        </p>
+                        <div>
+                            <label>Retirada<input id="locacao-data-inicio" type="date" /></label><label>Devolução<input
+                                    id="locacao-data-fim" type="date" /></label>
+                        </div>
+                        <small id="locacao-periodo-resumo">Selecione as datas para calcular o período.</small>
+                    </div>
+                    <strong id="detalhe-preco" class="detalhe-preco"></strong><span id="detalhe-preco-ajuda"></span>
+                    <div class="input-group">
+                        <label for="detalhe-quantidade">Quantidade</label><input id="detalhe-quantidade" type="number"
+                            min="1" value="1" />
+                    </div>
+                    <div class="detalhe-total">
+                        Total <strong id="detalhe-total"></strong>
+                    </div>
+                    <button class="btn-primary" type="button" data-action="carrinho-adicionar">
+                        <i class="fa-solid fa-cart-plus"></i> Adicionar ao carrinho</button><small
+                        class="delivery-note"><i class="fa-solid fa-shield-halved"></i> Disponibilidade e valor
+                        final são confirmados antes do pedido.</small>
+                </div>
+            </div>
+            <section class="similar-products">
+                <div>
+                    <span class="eyebrow">Você também pode precisar</span>
+                    <h2>Produtos semelhantes</h2>
+                </div>
+                <div id="produtos-semelhantes" class="market-product-grid"></div>
+            </section>
+        </section>
+    </main>
+    <div id="shared-modals"></div>
+    <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>

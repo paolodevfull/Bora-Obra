@@ -8,6 +8,10 @@ class AcessoService:
         user = UserRepository.buscar_por_id(user_id) if user_id else None
         if not user:
             raise ServiceError('Entre na sua conta para continuar.', 401)
+        # O status precisa ser conferido em cada requisição: uma conta desativada
+        # não deve conservar acesso apenas porque sua sessão foi criada anteriormente.
+        if not user.ativo:
+            raise ServiceError('Esta conta está inativa. Fale com o responsável.', 403)
         if tipos and user.tipo not in tipos:
             raise ServiceError('Seu perfil não tem permissão para esta ação.', 403)
         return user

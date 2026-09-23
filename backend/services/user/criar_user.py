@@ -25,6 +25,8 @@ class CriarUserService:
             email=email,
             tipo=tipo,
             responsavel_id=dados.get('responsavel_id'),
+            telefone=str(dados.get('telefone') or '').strip(),
+            ativo=bool(dados.get('ativo', True)),
             endereco=endereco['endereco'],
             **{campo: endereco[campo] for campo in CAMPOS_ENDERECO}
         )

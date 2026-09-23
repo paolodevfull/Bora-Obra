@@ -16,4 +16,9 @@ def validar_produto(dados):
         value = values.get(key) or ''
         if not isinstance(value, str): raise ServiceError(f'{key} deve ser texto.')
         values[key] = value.strip()
-    return {k: v for k, v in values.items() if k in {'nome','loja_id','preco_venda','preco_locacao','disponivel','disponivel_venda','disponivel_locacao','status_manutencao','classificacao_curva_a','categoria','utilidade','descricao','cor_tamanho'}}
+    values['estoque'] = inteiro(values.get('estoque', 0), 'Estoque', minimum=0)
+    for key, maximum in [('unidade', 20), ('sku', 60), ('imagem_url', 500)]:
+        value = values.get(key) or ('un' if key == 'unidade' else '')
+        if not isinstance(value, str) or len(value.strip()) > maximum: raise ServiceError(f'{key} inválido.')
+        values[key] = value.strip()
+    return {k: v for k, v in values.items() if k in {'nome','loja_id','preco_venda','preco_locacao','disponivel','disponivel_venda','disponivel_locacao','status_manutencao','classificacao_curva_a','categoria','utilidade','descricao','cor_tamanho','estoque','unidade','sku','imagem_url'}}

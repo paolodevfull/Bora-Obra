@@ -29,11 +29,15 @@ function registrar(ids, evento, callback) {
 }
 
 export function configurarMascaras() {
-    registrar(['loja-telefone'], 'input', formatarTelefone);
+    registrar(['loja-telefone', 'user-telefone'], 'input', formatarTelefone);
+    registrar(['loja-documento'], 'input', valor => {
+        const n = valor.replace(/\D/g, '').slice(0, 14);
+        return n.length <= 11 ? n.replace(/^(\d{3})(\d)/, '$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1-$2') : n.replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\/\d{4})(\d)/, '$1-$2');
+    });
     registrar(['cad-numero', 'loja-numero', 'config-cliente-numero'], 'input', formatarNumeroEndereco);
     registrar(['cad-uf', 'loja-uf', 'config-cliente-uf'], 'input', valor => valor.replace(/[^a-z]/gi, '').toUpperCase().slice(0, 2));
 
-    registrar(['login-email', 'cad-email', 'user-email', 'config-cliente-email'], 'input', valor => valor.replace(/\s/g, '').toLowerCase());
+    registrar(['login-email', 'cad-email', 'user-email', 'config-cliente-email', 'loja-email'], 'input', valor => valor.replace(/\s/g, '').toLowerCase());
 
     registrar([
         'login-nome', 'cad-nome', 'loja-nome', 'user-nome', 'config-cliente-nome',

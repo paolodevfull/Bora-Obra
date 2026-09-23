@@ -2,7 +2,15 @@ import { formatarMoeda } from './ui.js';
 
 const instances = new Map();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const palette = { orange: '#FF6B00', green: '#00875A', warning: '#F5A623', red: '#D64545', blue: '#4B8FE2', text: '#F5F5F5', muted: '#B3B3B3', grid: '#333333' };
+function palette() {
+    const css = getComputedStyle(document.documentElement);
+    return {
+        orange: css.getPropertyValue('--orange').trim(), green: css.getPropertyValue('--green').trim(),
+        warning: css.getPropertyValue('--warning').trim(), red: css.getPropertyValue('--red').trim(), blue: '#4B8FE2',
+        text: css.getPropertyValue('--text').trim(), muted: css.getPropertyValue('--text-muted').trim(),
+        grid: css.getPropertyValue('--border').trim(), panel: css.getPropertyValue('--panel').trim()
+    };
+}
 
 function chartLibrary() {
     return globalThis.Chart || null;
@@ -27,22 +35,23 @@ function setState(canvasId, message = '') {
 }
 
 function options(currency = false, indexAxis = 'x') {
+    const colors = palette();
     return {
         responsive: true,
         maintainAspectRatio: false,
-        animation: reducedMotion ? false : {duration: 450},
+        animation: reducedMotion ? false : { duration: 450 },
         indexAxis,
-        interaction: {mode: 'index', intersect: false},
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-            legend: {labels: {color: palette.text, usePointStyle: true, padding: 16}},
-            tooltip: {callbacks: {label: context => `${context.dataset.label}: ${currency ? formatarMoeda(context.parsed.y ?? context.parsed) : context.formattedValue}`}}
+            legend: { labels: { color: colors.text, usePointStyle: true, padding: 16 } },
+            tooltip: { callbacks: { label: context => `${context.dataset.label}: ${currency ? formatarMoeda(context.parsed.y ?? context.parsed) : context.formattedValue}` } }
         },
         scales: indexAxis === 'x' ? {
-            x: {ticks: {color: palette.muted}, grid: {color: palette.grid}},
-            y: {beginAtZero: true, ticks: {color: palette.muted, callback: value => currency ? formatarMoeda(value) : value}, grid: {color: palette.grid}}
+            x: { ticks: { color: colors.muted }, grid: { color: colors.grid } },
+            y: { beginAtZero: true, grace: '12%', ticks: { color: colors.muted, callback: value => currency ? formatarMoeda(value) : value }, grid: { color: colors.grid } }
         } : {
-            x: {beginAtZero: true, ticks: {color: palette.muted}, grid: {color: palette.grid}},
-            y: {ticks: {color: palette.muted}, grid: {display: false}}
+            x: { beginAtZero: true, ticks: { color: colors.muted }, grid: { color: colors.grid } },
+            y: { ticks: { color: colors.muted }, grid: { display: false } }
         }
     };
 }
@@ -58,23 +67,68 @@ function create(canvasId, config, emptyMessage) {
 }
 
 export function criarGraficoFaturamento(canvasId, series) {
-    create(canvasId, {type: 'line', data: {labels: series.map(item => item.label), datasets: [
-        {label: 'Vendas', data: series.map(item => item.vendas), borderColor: palette.orange, backgroundColor: '#FF6B0030', fill: true, tension: .32},
-        {label: 'Locações', data: series.map(item => item.locacoes), borderColor: palette.green, backgroundColor: '#00875A25', fill: true, tension: .32}
-    ]}, options: options(true)}, 'Nenhum faturamento registrado no período.');
+    const colors = palette();
+    const unicoDia = series.length === 1;
+    const configuracaoDatasets = unicoDia
+        ? [
+            { label: 'Vendas', data: series.map(item => item.vendas), backgroundColor: colors.orange, borderColor: colors.orange, borderWidth: 1, borderRadius: 8, maxBarThickness: 90 },
+            { label: 'Locações', data: series.map(item => item.locacoes), backgroundColor: colors.green, borderColor: colors.green, borderWidth: 1, borderRadius: 8, maxBarThickness: 90 }
+        ]
+        : [
+            { label: 'Vendas', data: series.map(item => item.vendas), borderColor: colors.orange, backgroundColor: `${colors.orange}30`, fill: true, tension: .32, pointRadius: 5, pointHoverRadius: 7, pointBackgroundColor: colors.orange },
+            { label: 'Locações', data: series.map(item => item.locacoes), borderColor: colors.green, backgroundColor: `${colors.green}25`, fill: true, tension: .32, pointRadius: 5, pointHoverRadius: 7, pointBackgroundColor: colors.green }
+        ];
+    const chartOptions = options(true);
+    chartOptions.scales.x.offset = unicoDia;
+    create(canvasId, {
+        type: unicoDia ? 'bar' : 'line',
+        data: { labels: series.map(item => item.label), datasets: configuracaoDatasets },
+        options: chartOptions
+    }, 'Nenhum faturamento registrado no período.');
 }
 
 export function criarGraficoGastos(canvasId, series) {
-    create(canvasId, {type: 'line', data: {labels: series.map(item => item.label), datasets: [
-        {label: 'Total gasto', data: series.map(item => item.total), borderColor: palette.orange, backgroundColor: '#FF6B0030', fill: true, tension: .32}
-    ]}, options: options(true)}, 'Nenhum gasto registrado no período.');
+    const colors = palette();
+    create(canvasId, {
+        type: 'line', data: {
+            labels: series.map(item => item.label), datasets: [
+                { label: 'Total gasto', data: series.map(item => item.total), borderColor: colors.orange, backgroundColor: `${colors.orange}30`, fill: true, tension: .32 }
+            ]
+        }, options: options(true)
+    }, 'Nenhum gasto registrado no período.');
 }
 
 export function criarGraficoStatusPedidos(canvasId, status) {
+    const colors = palette();
     const labels = ['Pendente', 'A preparar', 'Concluído', 'Cancelado'];
-    create(canvasId, {type: 'doughnut', data: {labels, datasets: [{label: 'Pedidos', data: [status.Pendente || 0, status.Confirmado || 0, (status.Despachado || 0) + (status.Entregue || 0), status.Cancelado || 0], backgroundColor: [palette.warning, palette.blue, palette.green, palette.red], borderColor: '#1A1A1A', borderWidth: 3}]}, options: {...options(), cutout: '66%', scales: {}}}, 'Nenhum pedido registrado no período.');
+    create(canvasId, { type: 'doughnut', data: { labels, datasets: [{ label: 'Pedidos', data: [status.Pendente || 0, status.Confirmado || 0, (status.Despachado || 0) + (status.Entregue || 0), status.Cancelado || 0], backgroundColor: [colors.warning, colors.blue, colors.green, colors.red], borderColor: colors.panel, borderWidth: 3 }] }, options: { ...options(), cutout: '66%', scales: {} } }, 'Nenhum pedido registrado no período.');
 }
 
 export function criarGraficoModalidades(canvasId, modalidades) {
-    create(canvasId, {type: 'bar', data: {labels: ['Venda', 'Locação'], datasets: [{label: 'Pedidos', data: [modalidades.Venda || 0, modalidades.Locacao || 0], backgroundColor: [palette.orange, palette.green], borderRadius: 7}]}, options: options()}, 'Nenhuma venda ou locação registrada no período.');
+    const colors = palette();
+    create(canvasId, { type: 'bar', data: { labels: ['Venda', 'Locação'], datasets: [{ label: 'Pedidos', data: [modalidades.Venda || 0, modalidades.Locacao || 0], backgroundColor: [colors.orange, colors.green], borderRadius: 7 }] }, options: options() }, 'Nenhuma venda ou locação registrada no período.');
+}
+
+export function criarGraficoProdutosPopulares(canvasId, produtos) {
+    const colors = palette();
+    create(canvasId, {
+        type: 'bar',
+        data: {
+            labels: produtos.map(item => item.nome),
+            datasets: [{ label: 'Unidades pedidas', data: produtos.map(item => item.quantidade), backgroundColor: colors.orange, borderRadius: 7 }]
+        },
+        options: options(false, 'y')
+    }, 'Nenhum produto foi pedido neste período.');
+}
+
+export function criarGraficoCategorias(canvasId, categorias) {
+    const colors = palette();
+    create(canvasId, {
+        type: 'bar',
+        data: {
+            labels: categorias.map(item => item.nome),
+            datasets: [{ label: 'Unidades pedidas', data: categorias.map(item => item.quantidade), backgroundColor: colors.green, borderRadius: 7 }]
+        },
+        options: options(false, 'y')
+    }, 'Nenhuma categoria teve pedidos neste período.');
 }

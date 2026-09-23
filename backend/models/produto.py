@@ -18,6 +18,10 @@ class Produto(db.Model):
     classificacao_curva_a = db.Column(db.Boolean, nullable=False, default=False)
     descricao = db.Column(db.Text)
     cor_tamanho = db.Column(db.String(100))
+    estoque = db.Column(db.Integer, nullable=False, default=0)
+    unidade = db.Column(db.String(20), nullable=False, default='un')
+    sku = db.Column(db.String(60))
+    imagem_url = db.Column(db.String(500))
 
     def to_dict(self):
         return {
@@ -35,4 +39,8 @@ class Produto(db.Model):
             "classificacao_curva_a": self.classificacao_curva_a,
             "descricao": self.descricao,
             "cor_tamanho": self.cor_tamanho
+            ,"estoque": self.estoque
+            ,"unidade": self.unidade
+            ,"sku": self.sku
+            ,"imagem_url": self.imagem_url
         }

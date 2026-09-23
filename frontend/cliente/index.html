@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Marketplace · BoraObra</title>
+    <link rel="icon" href="/static/img/favicon.svg?v=20260922" type="image/svg+xml">
+    <script src="/static/js/theme-init.js"></script>
+    <link rel="stylesheet" href="/static/css/tokens.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=20260922-9">
+</head>
+
+<body class="bg-dark" data-area="cliente" data-page="catalogo">
+    <div id="notifications" class="notifications" aria-live="polite"></div>
+    <div id="app-shell"></div>
+    <main id="static-page-content" class="static-page-content">
+        <section id="cliente-tab-lojas" class="cliente-section active">
+            <div id="cliente-marketplace">
+                <section class="store-map-section" aria-labelledby="store-map-title">
+                    <header class="store-map-header">
+                        <div><span class="eyebrow">Perto de você</span>
+                            <h1 id="store-map-title">Encontre uma loja para sua obra</h1>
+                            <p>Sua posição fica no navegador e é usada apenas para ordenar as lojas por distância.</p>
+                        </div>
+                        <div class="store-map-actions">
+                            <label>Raio de busca<select id="raio-lojas">
+                                    <option value="5">5 km</option>
+                                    <option value="10">10 km</option>
+                                    <option value="25" selected>25 km</option>
+                                    <option value="50">50 km</option>
+                                </select></label>
+                            <button class="btn-primary" type="button" data-action="localizacao-ativar"><i
+                                    class="fa-solid fa-location-crosshairs"></i> Usar minha localização</button>
+                        </div>
+                    </header>
+                    <div id="localizacao-status" class="location-status" role="status" aria-live="polite">Permita a
+                        localização para ver as lojas mais próximas.</div>
+                    <div id="mapa-lojas" class="store-map" aria-label="Mapa com lojas próximas"></div>
+                </section>
+                <div class="market-hero">
+                    <div><span class="eyebrow">Tudo para sua obra</span>
+                        <h1>Ferramenta certa,<br><strong>sem complicação.</strong></h1>
+                        <p>Compre ou alugue em lojas próximas e acompanhe tudo em um só lugar.</p>
+                    </div><i class="fa-solid fa-person-digging"></i>
+                </div>
+                <section class="nearby-stores" aria-labelledby="nearby-title">
+                    <div class="nearby-heading">
+                        <div><span class="eyebrow">Retire perto de você</span>
+                            <h2 id="nearby-title">Lojas próximas</h2>
+                        </div><label class="store-search"><i class="fa-solid fa-magnifying-glass"></i><input
+                                id="busca-lojas" type="search" placeholder="Busque por loja ou endereço"
+                                aria-label="Buscar lojas próximas"></label>
+                    </div>
+                    <div id="lojas-proximas" class="nearby-grid" aria-live="polite">
+                        <div class="nearby-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Buscando lojas...
+                        </div>
+                    </div>
+                </section>
+                <div class="market-layout">
+                    <aside id="market-filters" class="market-filters" aria-label="Filtros do catálogo">
+                        <div class="filter-title"><i class="fa-solid fa-sliders"></i>
+                            <h2>Filtros</h2><button class="filter-close" type="button" data-action="filtros-mobile"
+                                aria-label="Fechar filtros"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <fieldset>
+                            <legend>Quero</legend>
+                            <div class="operation-toggle"><button class="active" type="button" data-action="operacao"
+                                    data-operation="Venda" aria-pressed="true">Comprar</button><button type="button"
+                                    data-action="operacao" data-operation="Locacao" aria-pressed="false">Alugar</button>
+                            </div>
+                        </fieldset>
+                        <label>Categoria<select id="filtro-categoria">
+                                <option value="">Todas as categorias</option>
+                            </select></label>
+                        <label>Loja<select id="filtro-loja">
+                                <option value="">Todas as lojas</option>
+                            </select></label>
+                        <fieldset class="price-filter">
+                            <legend>Faixa de preço</legend>
+                            <div><input id="filtro-preco-min" type="number" min="0" step="1" placeholder="Mínimo"
+                                    aria-label="Preço mínimo"><input id="filtro-preco-max" type="number" min="0"
+                                    step="1" placeholder="Máximo" aria-label="Preço máximo"></div>
+                        </fieldset>
+                        <label class="check-filter"><input id="filtro-disponivel" type="checkbox"
+                                checked><span></span>Somente disponíveis</label>
+                        <button type="button" class="filter-clear" data-action="filtros-limpar">Limpar filtros</button>
+                        <div class="trust-card"><i class="fa-solid fa-shield-halved"></i>
+                            <div><strong>Pedido seguro</strong><small>Valores conferidos pelo servidor</small></div>
+                        </div>
+                    </aside>
+                    <section class="market-results" aria-live="polite">
+                        <header>
+                            <div><span class="eyebrow">Catálogo</span>
+                                <h2>Equipamentos para sua obra</h2>
+                            </div><label class="sort-control">Ordenar<select id="ordenar-produtos">
+                                    <option value="relevancia">Relevância</option>
+                                    <option value="menor-preco">Menor preço</option>
+                                    <option value="maior-preco">Maior preço</option>
+                                    <option value="recentes">Mais recentes</option>
+                                </select></label>
+                        </header>
+                        <div id="filtros-ativos" class="active-filters" aria-label="Filtros ativos"></div><small
+                            id="resultado-contagem">Carregando...</small>
+                        <div id="cliente-catalogo-produtos" class="market-product-grid skeleton-grid">
+                            <div class="product-skeleton"></div>
+                            <div class="product-skeleton"></div>
+                            <div class="product-skeleton"></div>
+                        </div><button id="catalogo-carregar-mais" class="load-more hidden" type="button"
+                            data-action="catalogo-mais">Carregar mais produtos</button>
+                    </section>
+                </div>
+            </div>
+
+            <div id="cliente-produto-detalhe" class="produto-detalhe hidden">
+                <nav class="breadcrumb" aria-label="Navegação estrutural"><button type="button"
+                        data-action="produto-voltar">Início</button><i class="fa-solid fa-chevron-right"></i><span
+                        id="detalhe-breadcrumb-categoria">Produto</span></nav>
+                <button class="btn-back" type="button" data-action="produto-voltar"><i
+                        class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
+                <div class="produto-detalhe-layout">
+                    <div class="produto-imagem-placeholder" role="img" aria-label="Imagem ilustrativa do produto"><i
+                            class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <div class="produto-detalhe-info"><small id="detalhe-categoria"></small>
+                        <h2 id="detalhe-nome"></h2>
+                        <p id="detalhe-utilidade"></p>
+                        <div id="detalhe-loja" class="detail-store"></div>
+                        <fieldset class="detail-operation">
+                            <legend>Como você quer este equipamento?</legend>
+                            <div class="operation-toggle"><button type="button" data-action="operacao"
+                                    data-operation="Venda" aria-pressed="false"><i
+                                        class="fa-solid fa-cart-shopping"></i> Comprar</button><button type="button"
+                                    data-action="operacao" data-operation="Locacao" aria-pressed="false"><i
+                                        class="fa-solid fa-clock-rotate-left"></i> Alugar</button></div><small
+                                id="detalhe-operacao-ajuda"></small>
+                        </fieldset>
+                        <div id="checkout-datas" class="checkout-dates detail-rental-period hidden"><strong><i
+                                    class="fa-regular fa-calendar"></i> Período da locação</strong>
+                            <p>Escolha a retirada e a devolução antes de adicionar o equipamento.</p>
+                            <div><label>Retirada<input id="locacao-data-inicio"
+                                        type="date"></label><label>Devolução<input id="locacao-data-fim"
+                                        type="date"></label></div><small id="locacao-periodo-resumo">Selecione as datas
+                                para calcular o período.</small>
+                        </div><strong id="detalhe-preco" class="detalhe-preco"></strong><span
+                            id="detalhe-preco-ajuda"></span>
+                        <div class="input-group"><label for="detalhe-quantidade">Quantidade</label><input
+                                id="detalhe-quantidade" type="number" min="1" value="1"></div>
+                        <div class="detalhe-total">Total <strong id="detalhe-total"></strong></div><button
+                            class="btn-primary" type="button" data-action="carrinho-adicionar"><i
+                                class="fa-solid fa-cart-plus"></i> Adicionar ao pedido</button><small
+                            class="delivery-note"><i class="fa-solid fa-shield-halved"></i> Disponibilidade e valor
+                            final são confirmados pelo servidor.</small>
+                    </div>
+                </div>
+                <section class="similar-products">
+                    <div><span class="eyebrow">Você também pode precisar</span>
+                        <h2>Produtos semelhantes</h2>
+                    </div>
+                    <div id="produtos-semelhantes" class="market-product-grid"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+    <div id="shared-modals"></div>
+    <script defer src="/static/vendor/leaflet/leaflet.js"></script>
+    <script type="module" src="/static/js/main.js?v=20260922-9"></script>
+</body>
+
+</html>
