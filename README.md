@@ -4,6 +4,7 @@ Em “Gestão (painel do lojista)”
 - Layout responsivo com menu lateral fixo no desktop e recolhível no celular.
 - Upload, validação, redimensionamento e remoção do logotipo da loja.
 - Relatórios filtráveis com indicadores, gráficos e exportações em XML e PNG.
+
 Em “Compra (painel do cliente)”
 - Seleção do período de locação diretamente na página do produto.
 - Atualização automática do preço conforme quantidade e duração da locação.
