@@ -1,5 +1,13 @@
 # Arquitetura do BoraObra
 
+## Configuração e middleware
+
+- `backend/config/settings.py` concentra ambiente, pool MySQL, cookies e limites operacionais.
+- `backend/middleware/request_context.py` valida ou gera `X-Request-ID`, mede a duração e registra requisições lentas.
+- `app.py` compõe blueprints, hooks, páginas estáticas e handlers globais.
+
+O checkout recalcula preços no backend, bloqueia produtos com `SELECT ... FOR UPDATE` e persiste pedido, itens e estoque na mesma transação. O par `(user_id, idempotency_key)` impede repetição da movimentação em retries. Cancelamentos bloqueiam os produtos antes da devolução.
+
 ## Visão geral
 
 O BoraObra é uma aplicação web em camadas. O Flask serve páginas HTML estáticas e uma API JSON. A interface é renderizada no navegador com JavaScript Vanilla; não há Jinja.
@@ -11,7 +19,7 @@ Navegador (HTML por página + módulos JS + CSS)
 Flask (controllers → services → repositories → models)
         │
         ▼
-SQLite no desenvolvimento
+MySQL 8 (InnoDB, utf8mb4)
 ```
 
 ## Diretórios
@@ -21,7 +29,7 @@ SQLite no desenvolvimento
 - `backend/services`: casos de uso, autorização e regras de negócio.
 - `backend/repositories`: consultas e transações.
 - `backend/models`: entidades SQLAlchemy.
-- `backend/database`: inicialização e migrações aditivas legadas.
+- `backend/database`: conexão, validação não destrutiva do schema e recursos SQL.
 - `frontend/cliente`: páginas do comprador.
 - `frontend/lojista`: páginas do lojista e funcionário.
 - `frontend/static/js`: componentes e módulos por responsabilidade.
@@ -43,7 +51,7 @@ Controllers não devem confiar em IDs enviados pelo navegador para determinar a 
 4. O lojista altera `Pendente → Confirmado → Despachado`.
 5. O cliente confirma `Despachado → Entregue`.
 
-Locações validam o estoque físico, mas ainda registram somente a quantidade de dias. Datas de início/fim e reservas concorrentes exigem evolução do schema.
+Locações persistem datas de início e fim. Reservas concorrentes por período ainda exigem evolução específica.
 
 ## Decisões e dívida técnica
 
@@ -51,4 +59,4 @@ Locações validam o estoque físico, mas ainda registram somente a quantidade d
 - Chart.js e Leaflet são servidos localmente e somente nas páginas que precisam deles.
 - ViaCEP roda no navegador; Nominatim e BrasilAPI são consultados pelo backend.
 - Coordenadas ficam persistidas para evitar geocodificação a cada abertura do mapa.
-- Dinheiro e datas ainda seguem o schema legado (`Float` e texto). A migração para `Numeric` e `DateTime` deve usar Alembic e backup.
+- Dinheiro utiliza `DECIMAL`/`Numeric`; datas usam `DATE` e `DATETIME`.

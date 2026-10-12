@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from backend.models.pedido import Pedido
 from backend.repositories.pedido_repository import PedidoRepository
@@ -10,6 +10,14 @@ from backend.services.errors import ServiceError
 class CriarPedidoService:
     def executar(self, dados):
         user_id = inteiro(dados.get('user_id'), 'Cliente')
+        idempotency_key = dados.get('idempotency_key')
+        if idempotency_key is not None:
+            idempotency_key = texto(idempotency_key, 'Chave da tentativa', maximum=64)
+            if len(idempotency_key) < 8:
+                raise ServiceError('Chave da tentativa inválida.')
+            existente = PedidoRepository.buscar_por_idempotencia(user_id, idempotency_key)
+            if existente:
+                return existente.to_dict(incluir_itens=True)
         loja_id = inteiro(dados.get('loja_id'), 'Loja')
         user = UserRepository.buscar_por_id(user_id)
         if not user or user.tipo != 'cliente': raise ServiceError('Cliente não encontrado.', 404)
@@ -34,17 +42,21 @@ class CriarPedidoService:
         items = dados.get('itens')
         if not isinstance(items, list) or not 1 <= len(items) <= 100:
             raise ServiceError('Inclua entre 1 e 100 itens no pedido.')
+        produto_ids = []
+        for item in items:
+            if not isinstance(item, dict):
+                raise ServiceError('Item do pedido inválido.')
+            produto_ids.append(inteiro(item.get('produto_id'), 'Produto'))
+        if len(set(produto_ids)) != len(produto_ids):
+            raise ServiceError('Cada produto deve aparecer apenas uma vez no pedido.')
+        produtos_por_id = {produto.id: produto for produto in ProdutoRepository.buscar_ids_para_atualizacao(produto_ids)}
+
         total = Decimal('0')
         validated = []
         produtos_validados = []
-        produtos_no_pedido = set()
         for item in items:
-            if not isinstance(item, dict): raise ServiceError('Item do pedido inválido.')
-            produto = ProdutoRepository.buscar_por_id(inteiro(item.get('produto_id'), 'Produto'))
+            produto = produtos_por_id.get(inteiro(item.get('produto_id'), 'Produto'))
             if not produto or produto.loja_id != loja_id: raise ServiceError('Produto não encontrado nesta loja.', 404)
-            if produto.id in produtos_no_pedido:
-                raise ServiceError('Cada produto deve aparecer apenas uma vez no pedido.')
-            produtos_no_pedido.add(produto.id)
             enabled = produto.disponivel_venda if tipo == 'Venda' else produto.disponivel_locacao
             if not produto.disponivel or not enabled or produto.status_manutencao:
                 raise ServiceError(f'{produto.nome} está indisponível para esta operação.')
@@ -53,22 +65,21 @@ class CriarPedidoService:
                 raise ServiceError(f'{produto.nome}: há somente {produto.estoque} {produto.unidade or "un"} em estoque.')
             dias = dias_do_periodo or (inteiro(item.get('dias_locacao',1), 'Dias de locação') if tipo == 'Locacao' else 1)
             preco = positivo(produto.preco_venda if tipo == 'Venda' else produto.preco_locacao, 'Preço')
-            total += Decimal(str(preco)) * quantidade * dias
+            total += preco * quantidade * dias
             validated.append(dict(produto_id=produto.id, quantidade=quantidade, dias_locacao=dias, valor_unitario=preco))
             produtos_validados.append((produto, quantidade))
         if total > 1000000000: raise ServiceError('Valor do pedido excede o limite permitido.')
         pagamento = texto(dados.get('forma_pagamento') or 'Não informado', 'Pagamento', maximum=30)
-        endereco = dados.get('endereco_entrega') or ''
+        endereco = texto(dados.get('endereco_entrega'), 'Endereço de entrega', maximum=250)
         observacao = dados.get('observacao') or ''
-        if not isinstance(endereco, str) or not isinstance(observacao, str): raise ServiceError('Endereço e observação devem ser texto.')
-        if len(endereco.strip()) > 250: raise ServiceError('Endereço deve ter no máximo 250 caracteres.')
+        if not isinstance(observacao, str): raise ServiceError('Observação deve ser texto.')
         if len(observacao.strip()) > 1000: raise ServiceError('Observação deve ter no máximo 1000 caracteres.')
         pedido = Pedido(user_id=user_id, loja_id=loja_id, tipo=tipo, status='Pendente',
-            valor_total=float(total.quantize(Decimal('0.01'))), forma_pagamento=pagamento,
-            endereco_entrega=endereco.strip(), observacao=observacao.strip(),
-            data_inicio_locacao=inicio_locacao.isoformat() if inicio_locacao else None,
-            data_fim_locacao=fim_locacao.isoformat() if fim_locacao else None,
-            created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            valor_total=total.quantize(Decimal('0.01')), forma_pagamento=pagamento,
+            endereco_entrega=endereco, observacao=observacao.strip(),
+            data_inicio_locacao=inicio_locacao,
+            data_fim_locacao=fim_locacao,
+            idempotency_key=idempotency_key)
         if tipo == 'Venda':
             for produto, quantidade in produtos_validados:
                 produto.estoque -= quantidade

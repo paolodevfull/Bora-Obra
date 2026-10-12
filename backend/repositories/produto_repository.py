@@ -6,6 +6,12 @@ class ProdutoRepository(BaseRepository):
     model = Produto
 
     @staticmethod
+    def buscar_ids_para_atualizacao(ids):
+        """Lock product rows in a stable order for stock-changing transactions."""
+        return (Produto.query.filter(Produto.id.in_(sorted(set(ids))))
+                .order_by(Produto.id).with_for_update().all())
+
+    @staticmethod
     def buscar_por_utilidade_e_categoria(utilidade=None, categoria=None, disponivel_apenas=True):
         query = Produto.query
 

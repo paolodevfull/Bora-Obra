@@ -97,6 +97,7 @@ export async function realizarCadastro(e) {
         telefone: document.getElementById('cad-telefone').value,
         senha: senha.value,
         tipo: document.getElementById('cad-tipo').value,
+        ...obterEndereco('cad'),
     };
 
     try {

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/static/css/tokens.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/static/css/style.css?v=20260922-9" />
+  <link rel="stylesheet" href="/static/css/relatorios.css" />
 </head>
 
 <body class="bg-dark" data-area="lojista" data-page="relatorios">
@@ -27,13 +28,15 @@
         </div>
         <div class="header-actions">
           <button class="btn-secondary" type="button" data-action="relatorio-exportar-xml">
-            <i class="fa-solid fa-file-code"></i> Baixar XML</button><button class="btn-secondary" type="button"
-            data-action="relatorio-grafico-png">
-            <i class="fa-solid fa-image"></i> Gráfico PNG
+            <i class="fa-solid fa-file-code"></i> XML</button><button class="btn-secondary" type="button" data-action="relatorio-exportar-pdf">
+            <i class="fa-solid fa-file-pdf"></i> PDF</button><button class="btn-secondary" type="button"
+            data-action="relatorio-grafico-png"><i class="fa-solid fa-image"></i> PNG completo
           </button>
         </div>
       </header>
+      <div class="report-filter-panel">
       <form id="form-relatorio-filtros" class="report-filters">
+        <h3 class="report-full">Escolha o período</h3>
         <div class="report-shortcuts">
           <button type="button" data-action="relatorio-periodo" data-period="hoje">
             Hoje</button><button type="button" data-action="relatorio-periodo" data-period="7d">
@@ -43,7 +46,10 @@
           </button>
         </div>
         <label>Data inicial<input id="relatorio-inicio" type="date" required /></label><label>Data final<input
-            id="relatorio-fim" type="date" required /></label><label>Modalidade<select id="relatorio-tipo">
+            id="relatorio-fim" type="date" required /></label>
+        <details class="report-advanced report-full"><summary>Refinar resultados <small>Produtos, clientes e pedidos</small></summary>
+        <div class="report-fields">
+        <label>Modalidade<select id="relatorio-tipo">
             <option value="">Todas</option>
             <option value="Venda">Venda</option>
             <option value="Locacao">Locação</option>
@@ -61,14 +67,31 @@
             <option>Cartão de débito</option>
             <option>Dinheiro</option>
           </select></label><label>Cliente<input id="relatorio-cliente"
-            placeholder="Nome do cliente" /></label><label>Produto<input id="relatorio-produto"
-            placeholder="Nome do produto" /></label><label>Categoria<input id="relatorio-categoria"
-            placeholder="Categoria" /></label><button class="btn-primary" type="submit">
-          <i class="fa-solid fa-filter"></i> Aplicar filtros
-        </button>
+            placeholder="Nome do cliente" /></label><label>Loja<select id="relatorio-loja" aria-label="Loja"></select></label>
+        <details class="report-product-picker" open><summary>Selecionar categorias e produtos <span id="produtos-contagem">todos os produtos</span></summary>
+          <p>Marque uma categoria inteira ou abra o grupo para escolher produtos específicos. Sem seleção, o relatório considera todo o catálogo.</p>
+          <label>Localizar categoria ou produto<input type="search" id="produtos-busca" placeholder="Ex.: Maquinário ou Betoneira" /></label>
+          <div class="header-actions"><button type="button" id="produtos-todos">Considerar todo o catálogo</button><button type="button" id="produtos-limpar">Desmarcar produtos</button></div>
+          <div id="produtos-opcoes" aria-live="polite"></div>
+        </details>
+        <label>Região de entrega<input id="relatorio-regiao" placeholder="Bairro, cidade ou endereço" /></label>
+        </div></details>
+        <details class="report-advanced report-full"><summary>Organizar ranking <small>Ordem e quantidade de produtos</small></summary><div class="report-fields">
+        <label>Análise<select id="relatorio-ordenacao">
+          <option value="mais_vendidos">Produtos mais vendidos</option><option value="menos_vendidos">Produtos menos vendidos</option>
+          <option value="maior_faturamento">Maior valor</option><option value="menor_faturamento">Menor valor</option>
+          <option value="sem_vendas">Produtos sem vendas</option><option value="recentes">Vendas mais recentes</option>
+        </select></label>
+        <label>Critério do ranking<select id="relatorio-criterio"><option value="quantidade">Quantidade</option><option value="faturamento">Valor dos pedidos confirmados</option></select></label>
+        <label>Quantidade de resultados<select id="relatorio-limite"><option value="5">Top 5</option><option value="10" selected>Top 10</option><option value="20">Top 20</option><option value="todos">Todos</option></select></label>
+        </div></details>
+        <div class="report-actions report-full"><button class="btn-primary" type="submit">Atualizar relatório</button><button type="button" class="btn-secondary" id="relatorio-limpar">Limpar filtros</button></div>
       </form>
-      <div id="relatorio-filtros-ativos" class="active-filters" aria-live="polite"></div>
+      </div>
+      <p id="relatorio-feedback" role="status"></p>
+      <details class="report-applied"><summary>Ver filtros aplicados</summary><div id="relatorio-filtros-ativos" class="active-filters" aria-live="polite"></div></details>
       <div id="relatorio-kpis" class="dashboard-kpis"></div>
+      <details class="report-explanation"><summary>Como os valores são calculados?</summary><p id="relatorio-regra"></p></details>
       <article class="chart-card chart-wide">
         <header>
           <div>
@@ -81,6 +104,8 @@
           <div id="relatorio-chart-state" class="chart-state hidden"></div>
         </div>
       </article>
+      <article class="chart-card"><h3>Desempenho dos produtos</h3><p id="ranking-criterio"></p><div id="relatorio-ranking" class="report-table"></div></article>
+      <article class="chart-card"><h3>Pedidos no período</h3><div id="relatorio-pedidos" class="report-table"></div></article>
     </section>
   </main>
   <div id="shared-modals"></div>

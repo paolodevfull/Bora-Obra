@@ -63,6 +63,7 @@ const actions = {
     },
     'relatorio-periodo': element => { relatorios.definirPeriodo(element.dataset.period); relatorios.carregarRelatorioFiltrado(); },
     'relatorio-exportar-xml': () => relatorios.exportarXml(),
+    'relatorio-exportar-pdf': () => relatorios.exportarPdf(),
     'relatorio-grafico-png': () => relatorios.exportarGraficoPng(),
     'loja-editar': () => gestao.abrirEdicaoLoja(),
     'loja-logo-escolher': () => document.getElementById('loja-logo-arquivo')?.click(),
@@ -248,7 +249,7 @@ function registrarEventos() {
     window.addEventListener('boraobra:theme-changed', () => {
         if (document.body.dataset.page === 'dashboard') dashboard.renderDashboardLojista();
         if (document.body.dataset.page === 'dashboard-cliente') dashboard.renderDashboardCliente();
-        if (document.body.dataset.page === 'relatorios') relatorios.carregarRelatorioFiltrado();
+        if (document.body.dataset.page === 'relatorios') relatorios.atualizarTema();
     });
     const sincronizarPainelLojista = debounce(() => {
         if (document.hidden || !['lojista', 'funcionario'].includes(state.perfilOperacional)) return;
@@ -273,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sincronizarMenuResponsivo();
     updateThemeControls();
     registrarEventos();
-    configurarViaCep(['loja', 'config-cliente']);
+    configurarViaCep(['cad', 'loja', 'config-cliente']);
     configurarMascaras();
     if (document.getElementById('relatorio-inicio')) relatorios.definirPeriodo('30d');
     document.querySelectorAll('.input-group').forEach(group => {

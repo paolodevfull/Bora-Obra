@@ -2,6 +2,7 @@ from backend.database.database import db
 
 from backend.models.base_model import ModeloBase
 from backend.models.estoque import Estoque
+from backend.models.entrega import Entrega
 from backend.models.item_pedidos import ItemPedidos
 from backend.models.loja import Loja
 from backend.models.pedido import Pedido
@@ -12,10 +13,10 @@ __all__ = [
     "db",
     "ModeloBase",
     "Estoque",
+    "Entrega",
     "ItemPedidos",
     "Loja",
     "Pedido",
     "Produto",
     "User",
 ]
-from backend.models.entrega import Entrega

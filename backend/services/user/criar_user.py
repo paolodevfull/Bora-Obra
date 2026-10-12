@@ -19,13 +19,14 @@ class CriarUserService:
         if UserRepository.buscar_por_email(email):
             raise ServiceError("Já existe uma conta cadastrada com esse e-mail.")
 
-        endereco = normalizar_endereco(dados)
+        telefone = texto(dados.get('telefone'), 'Telefone', 8, 20)
+        endereco = normalizar_endereco(dados, obrigatorio=True)
         usuario = User(
             nome=nome,
             email=email,
             tipo=tipo,
             responsavel_id=dados.get('responsavel_id'),
-            telefone=str(dados.get('telefone') or '').strip(),
+            telefone=telefone,
             ativo=bool(dados.get('ativo', True)),
             endereco=endereco['endereco'],
             **{campo: endereco[campo] for campo in CAMPOS_ENDERECO}

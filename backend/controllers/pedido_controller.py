@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, session
+from flask import Blueprint, jsonify, session, request
 from backend.controllers.http import endpoint, json_body
 from backend.services.acesso import AcessoService
 from backend.services.pedido.criar_pedido import CriarPedidoService
@@ -12,7 +12,10 @@ pedido_bp = Blueprint('pedido_bp', __name__, url_prefix='/api/pedidos')
 @endpoint
 def criar():
     user = AcessoService().usuario(session.get('user_id'), {'cliente'})
-    return jsonify(CriarPedidoService().executar({**json_body(), 'user_id':user.id})),201
+    dados = {**json_body(), 'user_id': user.id}
+    if request.headers.get('Idempotency-Key'):
+        dados['idempotency_key'] = request.headers['Idempotency-Key']
+    return jsonify(CriarPedidoService().executar(dados)),201
 @pedido_bp.route('', methods=['GET'])
 @endpoint
 def listar():

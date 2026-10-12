@@ -44,6 +44,7 @@
                   ><input
                     id="prod-sku"
                     maxlength="60"
+                    required
                     placeholder="Ex.: BET-400-220"
                   /><small class="field-help"
                     >Use o código que você já utiliza no estoque.</small
@@ -95,6 +96,8 @@
                   <input
                     type="text"
                     id="prod-categoria"
+                    maxlength="50"
+                    required
                     placeholder="Maquinário"
                   />
                 </div>
@@ -103,6 +106,8 @@
                   <input
                     type="text"
                     id="prod-utilidade"
+                    maxlength="100"
+                    required
                     placeholder="Concretagem"
                   />
                 </div>
@@ -121,6 +126,8 @@
                   <input
                     type="text"
                     id="prod-descricao"
+                    maxlength="2000"
+                    required
                     placeholder="Detalhes adicionais"
                   />
                 </div>
@@ -235,7 +242,7 @@
             </div>
             <div class="grid-inputs">
               <div class="input-group">
-                <label>SKU</label><input id="edit-prod-sku" maxlength="60" />
+                <label>SKU</label><input id="edit-prod-sku" maxlength="60" required />
               </div>
               <div class="input-group">
                 <label>Imagem (URL)</label
@@ -260,11 +267,11 @@
             <div class="grid-inputs">
               <div class="input-group">
                 <label>Categoria</label>
-                <input type="text" id="edit-prod-categoria" />
+                <input type="text" id="edit-prod-categoria" maxlength="50" required />
               </div>
               <div class="input-group">
                 <label>Utilidade / etapa</label>
-                <input type="text" id="edit-prod-utilidade" />
+                <input type="text" id="edit-prod-utilidade" maxlength="100" required />
               </div>
             </div>
             <div class="grid-inputs">
@@ -274,7 +281,7 @@
               </div>
               <div class="input-group">
                 <label>Descrição</label>
-                <input type="text" id="edit-prod-descricao" />
+                <input type="text" id="edit-prod-descricao" maxlength="2000" required />
               </div>
             </div>
             <div class="grid-inputs">

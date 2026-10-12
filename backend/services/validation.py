@@ -18,7 +18,7 @@ def positivo(value, label):
         rounded = number.quantize(Decimal('0.01'))
         if rounded <= 0:
             raise ValueError
-        return float(rounded)
+        return rounded
     except (ValueError, InvalidOperation, TypeError):
         raise ServiceError(f'{label} deve ser um valor positivo válido.')
 

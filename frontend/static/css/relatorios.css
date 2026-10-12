@@ -1,0 +1,71 @@
+.report-filter-panel { border: 1px solid var(--color-border); border-radius: 12px; padding: 16px; background: var(--color-surface); }
+#tab-relatorios .report-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; border: 0; padding: 0; background: transparent; margin: 0; }
+#tab-relatorios .report-full, #tab-relatorios .report-shortcuts { grid-column: 1 / -1; }
+#tab-relatorios .report-filters h3 { font-size: 16px; margin: 0; }
+#tab-relatorios .report-filters label { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--color-text-secondary); min-width: 0; }
+#tab-relatorios .report-filters input, #tab-relatorios .report-filters select { min-height: 44px; width: 100%; min-width: 0; }
+.report-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 16px 0 8px; }
+.report-advanced { border-top: 1px solid var(--color-border); }
+.report-advanced summary { min-height: 44px; cursor: pointer; padding: 12px 0; font-size: 14px; font-weight: 600; }
+.report-advanced summary small { font-weight: 400; color: var(--color-text-secondary); margin-left: 12px; }
+#tab-relatorios .report-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; padding-top: 8px; }
+.report-actions button { min-height: 44px; }
+.report-applied, .report-explanation { margin: 12px 0; color: var(--color-text-secondary); font-size: 13px; }
+.report-applied summary, .report-explanation summary { cursor: pointer; padding: 8px 0; }
+#tab-relatorios .chart-card { margin-top: 24px; padding: 24px; }
+#tab-relatorios .dashboard-kpis { margin-top: 16px; gap: 16px; }
+#tab-relatorios .metric-card { padding: 20px; }
+#tab-relatorios .report-shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+#tab-relatorios .report-shortcuts button { min-height: 40px; padding: 8px 16px; font-size: 13px; }
+#relatorio-feedback:empty { display: none; }
+@media (max-width: 700px) {
+  #tab-relatorios .report-filters, .report-fields { grid-template-columns: minmax(0, 1fr); }
+  .report-advanced summary small { display: block; margin: 6px 0 0 18px; }
+  #tab-relatorios .report-actions button { flex: 1 1 140px; }
+  #tab-relatorios .chart-card { padding: 16px; }
+}
+.report-filter-panel summary, .report-product-picker summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+.report-product-picker { grid-column: 1 / -1; min-width: 0; }
+.report-product-picker p, #relatorio-regra { color: var(--color-text-secondary); }
+#produtos-opcoes { max-height: 300px; overflow-y: auto; display: grid; gap: 8px; margin: 12px 0; }
+#produtos-opcoes label { display: flex; align-items: center; gap: 12px; padding: 8px; min-height: 44px; }
+#produtos-opcoes input { width: 20px; height: 20px; flex: 0 0 20px; }
+#tab-relatorios #produtos-opcoes label { flex-direction: row; align-items: center; }
+#tab-relatorios #produtos-opcoes input { width: 20px; min-height: 20px; height: 20px; }
+.report-product-picker button { min-height: 44px; padding: 8px 12px; color: var(--color-text-primary); background: var(--color-surface-secondary); border: 1px solid var(--color-border); border-radius: 6px; }
+.report-product-group { border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface-secondary); overflow: hidden; }
+.report-product-group > summary { padding: 0; list-style-position: inside; }
+#tab-relatorios .report-category-check { display: inline-flex; flex-direction: row; width: calc(100% - 28px); cursor: pointer; }
+.report-category-check strong { color: var(--color-text-primary); }
+.report-category-check span { margin-left: auto; color: var(--color-text-secondary); font-size: 12px; }
+.report-product-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 6px 12px 12px 34px; background: var(--color-surface); border-top: 1px solid var(--color-border); }
+#tab-relatorios .report-product-list label { flex-direction: row; border-bottom: 1px solid var(--color-border); }
+.report-product-list label span { display: flex; flex-direction: column; min-width: 0; color: var(--color-text-primary); }
+.report-product-list small { color: var(--color-text-secondary); margin-top: 3px; }
+.report-table { overflow: auto; max-height: 520px; }
+.report-table table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; line-height: 1.5; }
+.report-table th, .report-table td { white-space: normal; overflow-wrap: anywhere; padding: 15px 18px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+.report-table th { position: sticky; top: 0; z-index: 1; background: var(--color-surface-secondary); color: var(--color-text-secondary); font-size: 12px; font-weight: 600; text-align: left; }
+.report-table td { color: var(--color-text-primary); }
+.report-table tbody tr:nth-child(even) { background: var(--color-surface-secondary); }
+.report-table tbody tr:hover { background: var(--color-hover, var(--color-surface-secondary)); }
+.report-table .report-number { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.report-table td:first-child { font-weight: 500; }
+.report-table caption { text-align: left; padding: 14px 0; color: var(--color-text-secondary); font-size: 13px; }
+.report-status { display: inline-block; border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; font-size: 12px; background: var(--color-surface); white-space: nowrap; }
+.report-status[data-status="Entregue"], .report-status[data-status="Confirmado"] { color: var(--color-success); }
+.report-status[data-status="Cancelado"] { color: var(--color-danger); }
+#ranking-criterio { color: var(--color-text-secondary); font-size: 13px; line-height: 1.6; margin: 10px 0; }
+#tab-relatorios { min-width: 0; }
+#relatorio-feedback { min-height: 24px; }
+@media (max-width: 600px) {
+  .report-table table, .report-table tbody, .report-table tr, .report-table td { display: block; }
+  .report-table thead { display: none; }
+  .report-table td::before { content: attr(data-label) ': '; font-weight: 600; }
+  .report-table tr { border-bottom: 1px solid var(--color-border); padding: 8px 0; }
+  .report-table th, .report-table td { padding: 9px 12px; border-bottom: 0; }
+  .report-table .report-number { text-align: left; }
+  .report-table caption { display: block; }
+  .report-filter-panel { padding: 8px; }
+  .report-product-list { grid-template-columns: 1fr; padding-left: 12px; }
+}

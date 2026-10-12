@@ -13,13 +13,22 @@ _login_attempts = defaultdict(deque)
 _login_lock = Lock()
 _LOGIN_WINDOW_SECONDS = 300
 _LOGIN_MAX_ATTEMPTS = 5
+_last_cleanup = 0.0
 
 def _login_key(data):
     return f"{request.remote_addr or 'unknown'}:{str(data.get('email') or '').strip().casefold()}"
 
 def _check_login_limit(key):
+    global _last_cleanup
     now = time.monotonic()
     with _login_lock:
+        if now - _last_cleanup > _LOGIN_WINDOW_SECONDS:
+            for known_key, known_attempts in list(_login_attempts.items()):
+                while known_attempts and now - known_attempts[0] > _LOGIN_WINDOW_SECONDS:
+                    known_attempts.popleft()
+                if not known_attempts:
+                    _login_attempts.pop(known_key, None)
+            _last_cleanup = now
         attempts = _login_attempts[key]
         while attempts and now - attempts[0] > _LOGIN_WINDOW_SECONDS:
             attempts.popleft()
@@ -55,6 +64,7 @@ def login():
     session.clear()
     session['user_id'], session['user_tipo'] = user['id'], user['tipo']
     session['_csrf_token'] = csrf_token or secrets.token_urlsafe(32)
+    session.permanent = True
     return jsonify(user)
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

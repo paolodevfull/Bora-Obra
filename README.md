@@ -59,7 +59,7 @@ Arquitetura em camadas, priorizando o **Princípio da Responsabilidade Única (S
 
 ## 💻 Tecnologias Utilizadas
 
-* **Backend:** Python, Flask, Flask-SQLAlchemy, SQLite, Werkzeug (hash de senha)
+* **Backend:** Python, Flask, Flask-SQLAlchemy, MySQL 8, PyMySQL e Werkzeug (hash de senha)
 * **Frontend:** HTML5, CSS3 e JavaScript Vanilla modular, com uma página HTML independente por área
 * **Gráficos:** Chart.js 4.4.7, servido localmente em `frontend/static/vendor/`
 * **Mapa:** Leaflet 1.9.4 com tiles e atribuição do OpenStreetMap
@@ -75,14 +75,26 @@ Arquitetura em camadas, priorizando o **Princípio da Responsabilidade Única (S
 ```bash
 # 1. Instalar dependências
 pip install -r requirements.txt
+python -m playwright install chromium
 
-# 2. Rodar a aplicação (cria o banco automaticamente na primeira execução)
+# 2. Copiar as variáveis de .env.example para o ambiente e iniciar o MySQL
+# 3. Validar a conexão e o schema existente
+python -m backend.database.check_connection
+
+# 4. Rodar a aplicação
 python app.py
 ```
 
 A aplicação sobe em `http://127.0.0.1:5000`.
 
-Na inicialização, o sistema cria as tabelas ausentes e aplica migrações aditivas compatíveis com o SQLite. O banco existente não é apagado e nenhuma conta de demonstração é criada automaticamente. Em produção, defina `BORAOBRA_ENV=production`, `FLASK_SECRET_KEY`, `DATABASE_URL` e `FLASK_COOKIE_SECURE=1`.
+O Playwright gera os relatórios completos em PDF e PNG. Se o download do Chromium não estiver disponível,
+configure `PLAYWRIGHT_CHROMIUM_EXECUTABLE` com o caminho de um Chrome, Edge ou Brave instalado.
+
+MySQL 8 é o único banco suportado. Na inicialização, o sistema valida a conexão e o schema existente; ele não cria tabelas nem alterna para SQLite. Configure `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `DB_CHARSET`. Em produção, defina também `BORAOBRA_ENV=production`, `FLASK_SECRET_KEY` e `FLASK_COOKIE_SECURE=1`.
+
+Antes de iniciar uma instalação já existente, execute as migrations de `backend/database/sql/migrations/` em ordem. `BORAOBRA_SESSION_MINUTES` define a duração da sessão autenticada e `BORAOBRA_SLOW_REQUEST_MS` controla quando uma requisição é registrada como lenta. Toda resposta inclui `X-Request-ID` e `Server-Timing`, úteis para correlacionar falhas sem registrar credenciais ou dados pessoais.
+
+O checkout aceita o header opcional `Idempotency-Key`. O frontend gera uma chave por tentativa e a reutiliza em retries, evitando pedidos e baixas de estoque duplicados. Mudanças de estoque bloqueiam as linhas de produto no MySQL durante a transação.
 
 ### Mapa e lojas próximas
 
@@ -130,6 +142,7 @@ Os números são calculados a partir dos pedidos retornados pelo backend; a inte
 ## ✅ Testes
 
 ```bash
+$env:TEST_DB_NAME="bora_obra_test"
 python -m unittest discover -s tests -v
 ```
 
@@ -141,7 +154,7 @@ python -m unittest discover -s tests -v
 Bora-Obra/
 ├── backend/
 │   ├── controllers/      # Rotas da API Flask
-│   ├── database/         # Configuração do banco e arquivo SQLite
+│   ├── database/         # Conexão MySQL, validação e recursos SQL
 │   ├── models/            # Entidades do SQLAlchemy
 │   ├── repositories/      # Consultas complexas e relatórios
 │   └── services/           # Regras de negócio, isoladas por domínio
@@ -172,7 +185,5 @@ As páginas são HTML estático, sem Jinja. O Flask serve os arquivos e mantém 
 
 ## 🗺️ Próximos passos
 
-- Migrar o banco de desenvolvimento de SQLite para MySQL.
 - Adotar migrações versionadas com Flask-Migrate/Alembic.
-- Substituir campos monetários `Float` por `Numeric` e datas textuais por `DateTime`.
 - Validar as métricas do dashboard com uma massa de dados controlada.

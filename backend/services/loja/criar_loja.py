@@ -12,16 +12,21 @@ class CriarLojaService:
         AcessoService().usuario(lojista_id, {'lojista'})
         nome = texto(dados.get('nome'), 'Nome', 3, 100)
         endereco = normalizar_endereco(dados, obrigatorio=True)
-        telefone = (dados.get('telefone') or '').strip()
-        responsavel_nome = texto(dados.get('responsavel_nome') or 'Não informado', 'Responsável', maximum=100)
-        documento = str(dados.get('documento') or '').strip()
-        email = str(dados.get('email') or '').strip().lower()
+        telefone = texto(dados.get('telefone'), 'Telefone', 8, 20)
+        responsavel_nome = texto(dados.get('responsavel_nome'), 'Responsável', maximum=100)
+        documento = texto(dados.get('documento'), 'CNPJ ou CPF', 11, 18)
+        email = texto(dados.get('email'), 'E-mail comercial', 5, 120).lower()
         logo_url = str(dados.get('logo_url') or '').strip()
+
+        if '@' not in email or '.' not in email.split('@')[-1]:
+            raise ServiceError('Informe um e-mail comercial válido.')
 
         if LojaRepository.buscar_por_lojista(lojista_id):
             raise ServiceError("Este lojista já possui uma loja cadastrada.")
 
         latitude, longitude = geocodificar_endereco(endereco['endereco'], endereco)
+        if latitude is None or longitude is None:
+            raise ServiceError('Não foi possível localizar este endereço. Confira os dados antes de salvar.')
         loja = Loja(nome=nome, endereco=endereco['endereco'], telefone=telefone, lojista_id=lojista_id,
                     responsavel_nome=responsavel_nome, documento=documento, email=email, logo_url=logo_url,
                     ativa=bool(dados.get('ativa', True)),

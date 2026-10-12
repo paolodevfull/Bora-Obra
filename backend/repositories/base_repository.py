@@ -15,17 +15,29 @@ class BaseRepository:
 
     @staticmethod
     def salvar(entity):
-        db.session.add(entity)
-        db.session.commit()
-        return entity
+        try:
+            db.session.add(entity)
+            db.session.commit()
+            return entity
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def atualizar(entity):
-        db.session.commit()
-        return entity
+        try:
+            db.session.commit()
+            return entity
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def deletar(entity):
-        db.session.delete(entity)
-        db.session.commit()
+        try:
+            db.session.delete(entity)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
 

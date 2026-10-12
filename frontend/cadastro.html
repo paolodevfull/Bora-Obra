@@ -42,7 +42,7 @@
             </div>
             <div class="input-group">
               <label for="cad-telefone">Telefone</label><input type="tel" id="cad-telefone" autocomplete="tel"
-                inputmode="tel" maxlength="15" placeholder="(31) 99999-9999" /><small class="field-error"
+                inputmode="tel" maxlength="15" placeholder="(31) 99999-9999" required /><small class="field-error"
                 id="cad-telefone-error"></small>
             </div>
           </div>
@@ -50,6 +50,23 @@
             <label for="cad-email">E-mail</label><input type="email" id="cad-email" autocomplete="email"
               placeholder="seu@email.com" required /><small class="field-error" id="cad-email-error"></small>
           </div>
+          <fieldset class="address-fieldset">
+            <legend>Seu endereço</legend>
+            <div class="address-grid">
+              <div class="input-group compact cep-field"><label for="cad-cep">CEP</label><input id="cad-cep"
+                inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required />
+                <small id="cad-cep-status" class="cep-status" aria-live="polite"></small></div>
+              <div class="input-group compact street-field"><label for="cad-logradouro">Logradouro</label>
+                <input id="cad-logradouro" autocomplete="address-line1" required /></div>
+              <div class="input-group compact"><label for="cad-numero">Número</label><input id="cad-numero"
+                maxlength="20" required /></div>
+              <div class="input-group compact"><label for="cad-complemento">Complemento</label>
+                <input id="cad-complemento" autocomplete="address-line2" /></div>
+              <div class="input-group compact"><label for="cad-bairro">Bairro</label><input id="cad-bairro" required /></div>
+              <div class="input-group compact"><label for="cad-cidade">Cidade</label><input id="cad-cidade" required /></div>
+              <div class="input-group compact"><label for="cad-uf">UF</label><input id="cad-uf" maxlength="2" required /></div>
+            </div>
+          </fieldset>
           <div class="grid-inputs">
             <div class="input-group">
               <label for="cad-senha">Senha</label>

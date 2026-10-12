@@ -27,7 +27,8 @@ def _geocodificar_por_cep(cep, headers):
 
 
 def geocodificar_endereco(endereco, componentes=None):
-    if current_app.config.get('TESTING') or not current_app.config.get('GEOCODING_ENABLED', True):
+    if ((current_app.config.get('TESTING') and not current_app.config.get('GEOCODING_TEST_ENABLED'))
+            or not current_app.config.get('GEOCODING_ENABLED', True)):
         return None, None
 
     componentes = componentes or {}

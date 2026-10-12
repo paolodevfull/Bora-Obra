@@ -447,8 +447,11 @@ export async function finalizarPedidoCliente() {
     botao.disabled = true;
     botao.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Gerando pedido...';
     try {
+        const idempotencyKey = sessionStorage.getItem('boraobra:checkout-key')
+            || (crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+        sessionStorage.setItem('boraobra:checkout-key', idempotencyKey);
         const response = await apiRequest('/api/pedidos', {
-            method: 'POST', body: JSON.stringify({
+            method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({
                 loja_id: state.lojaAtualCliente.id, tipo: state.tipoCompraAtual,
                 forma_pagamento: document.getElementById('carrinho-forma-pagamento').value,
                 endereco_entrega: endereco,
@@ -458,6 +461,7 @@ export async function finalizarPedidoCliente() {
             })
         });
         const pedido = await response.json();
+        sessionStorage.removeItem('boraobra:checkout-key');
         state.carrinhoCliente = [];
         state.lojaAtualCliente = null;
         renderizarCarrinho();
