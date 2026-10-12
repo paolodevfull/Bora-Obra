@@ -72,29 +72,96 @@ Arquitetura em camadas, priorizando o **Princípio da Responsabilidade Única (S
 
 ## ⚙️ Como rodar localmente
 
+### Pré-requisitos
+
+- Python 3;
+- MySQL 8, executado diretamente ou pelo WampServer;
+- MySQL Workbench, opcional para executar o schema e as migrations;
+- navegador baseado em Chromium para exportações em PDF e PNG.
+
+### 1. Instalação das dependências
+
 ```bash
-# 1. Instalar dependências
 pip install -r requirements.txt
 python -m playwright install chromium
+```
 
-# 2. Copiar as variáveis de .env.example para o ambiente e iniciar o MySQL
-# 3. Validar a conexão e o schema existente
+Caso o Chromium do Playwright não esteja disponível, utilize um Chrome, Edge ou Brave já instalado:
+
+```env
+PLAYWRIGHT_CHROMIUM_EXECUTABLE=C:\caminho\para\chrome.exe
+```
+
+### 2. Configuração do ambiente
+
+Crie um arquivo `.env` na raiz com base no `.env.example`:
+
+```env
+BORAOBRA_ENV=development
+FLASK_SECRET_KEY=gere-uma-chave-longa-e-segura
+
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=bora_obra
+DB_USER=root
+DB_PASSWORD=sua_senha
+DB_CHARSET=utf8mb4
+
+FLASK_DEBUG=0
+FLASK_COOKIE_SECURE=0
+BORAOBRA_SESSION_MINUTES=480
+BORAOBRA_SLOW_REQUEST_MS=1000
+
+BORAOBRA_GEOCODING=1
+BORAOBRA_GEOCODING_USER_AGENT=BoraObra/1.0 (contato: email@dominio.com)
+PLAYWRIGHT_CHROMIUM_EXECUTABLE=
+```
+
+> O `.env` contém credenciais locais e não deve ser enviado ao Git. Versione somente o `.env.example`.
+
+Em produção, use `BORAOBRA_ENV=production`, uma `FLASK_SECRET_KEY` aleatória e `FLASK_COOKIE_SECURE=1` sob HTTPS.
+
+### 3. Criação e atualização do banco
+
+O **MySQL 8 é o único banco suportado**. A aplicação não utiliza SQLite e não faz fallback automático quando o MySQL está indisponível.
+
+Para uma instalação nova, execute no MySQL Workbench:
+
+```text
+backend/database/sql/schema/bora_obra.sql
+```
+
+Em bancos existentes, execute em ordem crescente os arquivos de:
+
+```text
+backend/database/sql/migrations/
+```
+
+As migrations são aditivas e verificam a existência das estruturas antes das alterações. Para validar a conexão e o schema:
+
+```bash
 python -m backend.database.check_connection
+```
 
-# 4. Rodar a aplicação
+### 4. Execução
+
+Com o MySQL ou WampServer iniciado:
+
+```bash
 python app.py
 ```
 
-A aplicação sobe em `http://127.0.0.1:5000`.
+Acesse `http://127.0.0.1:5000`. Caso o MySQL esteja indisponível ou incompatível com as models, a inicialização é interrompida com uma mensagem clara nos logs.
 
-O Playwright gera os relatórios completos em PDF e PNG. Se o download do Chromium não estiver disponível,
-configure `PLAYWRIGHT_CHROMIUM_EXECUTABLE` com o caminho de um Chrome, Edge ou Brave instalado.
+### Sessões, logs e consistência dos pedidos
 
-MySQL 8 é o único banco suportado. Na inicialização, o sistema valida a conexão e o schema existente; ele não cria tabelas nem alterna para SQLite. Configure `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `DB_CHARSET`. Em produção, defina também `BORAOBRA_ENV=production`, `FLASK_SECRET_KEY` e `FLASK_COOKIE_SECURE=1`.
-
-Antes de iniciar uma instalação já existente, execute as migrations de `backend/database/sql/migrations/` em ordem. `BORAOBRA_SESSION_MINUTES` define a duração da sessão autenticada e `BORAOBRA_SLOW_REQUEST_MS` controla quando uma requisição é registrada como lenta. Toda resposta inclui `X-Request-ID` e `Server-Timing`, úteis para correlacionar falhas sem registrar credenciais ou dados pessoais.
-
-O checkout aceita o header opcional `Idempotency-Key`. O frontend gera uma chave por tentativa e a reutiliza em retries, evitando pedidos e baixas de estoque duplicados. Mudanças de estoque bloqueiam as linhas de produto no MySQL durante a transação.
+- `BORAOBRA_SESSION_MINUTES` define a duração da sessão autenticada;
+- `BORAOBRA_SLOW_REQUEST_MS` define quando uma requisição é registrada como lenta;
+- respostas incluem `X-Request-ID` e `Server-Timing` para diagnóstico;
+- o backend recalcula preços e totais sem confiar nos valores enviados pelo navegador;
+- o frontend envia uma `Idempotency-Key` por tentativa de checkout;
+- retries da mesma tentativa reutilizam o pedido existente;
+- movimentações de estoque utilizam transação e bloqueio de linha no MySQL.
 
 ### Mapa e lojas próximas
 
@@ -139,12 +206,28 @@ Gráficos atualmente utilizados:
 
 Os números são calculados a partir dos pedidos retornados pelo backend; a interface não preenche métricas com valores simulados.
 
+### Relatórios e exportações
+
+Os relatórios utilizam exclusivamente os registros do MySQL e respeitam os filtros selecionados, incluindo período, modalidade, status, pagamento, cliente, região, categoria e produtos.
+
+Formatos disponíveis:
+
+- **PDF:** documento completo gerado com Playwright;
+- **PNG:** captura em boa resolução gerada com `page.screenshot()`;
+- **XML:** arquivo estruturado gerado com `xml.etree.ElementTree`.
+
+As exportações não inserem valores estáticos no frontend. Indicadores, rankings e gráficos são calculados com base nos registros retornados pelo backend.
+
 ## ✅ Testes
+
+Os testes de integração utilizam um banco MySQL separado. O nome precisa terminar com `_test`, pois a preparação da suíte recria as tabelas desse banco.
 
 ```bash
 $env:TEST_DB_NAME="bora_obra_test"
 python -m unittest discover -s tests -v
 ```
+
+> Nunca configure `TEST_DB_NAME` com o nome do banco principal.
 
 ---
 
@@ -153,11 +236,17 @@ python -m unittest discover -s tests -v
 ```
 Bora-Obra/
 ├── backend/
+│   ├── config/           # Configuração centralizada por ambiente
 │   ├── controllers/      # Rotas da API Flask
-│   ├── database/         # Conexão MySQL, validação e recursos SQL
-│   ├── models/            # Entidades do SQLAlchemy
-│   ├── repositories/      # Consultas complexas e relatórios
-│   └── services/           # Regras de negócio, isoladas por domínio
+│   ├── database/
+│   │   ├── connection.py # Construção e teste da conexão MySQL
+│   │   └── sql/
+│   │       ├── schema/   # Criação de uma instalação nova
+│   │       └── migrations/ # Atualizações de bancos existentes
+│   ├── middleware/       # Segurança, rastreabilidade e tempo de resposta
+│   ├── models/           # Entidades do SQLAlchemy
+│   ├── repositories/     # Acesso e consultas ao banco
+│   └── services/         # Regras de negócio isoladas por domínio
 ├── frontend/
 │   ├── login.html          # Entrada na conta
 │   ├── cadastro.html       # Criação de conta
@@ -168,6 +257,8 @@ Bora-Obra/
 │   │   ├── js/             # Componentes, API, dashboards, catálogo, mapa e ticket
 │   │   └── vendor/         # Chart.js e Leaflet servidos localmente
 ├── app.py                  # Ponto de entrada do Flask
+├── .env.example            # Exemplo seguro das variáveis aceitas
+├── requirements.txt        # Dependências Python
 └── README.md
 ```
 
@@ -186,4 +277,6 @@ As páginas são HTML estático, sem Jinja. O Flask serve os arquivos e mantém 
 ## 🗺️ Próximos passos
 
 - Adotar migrações versionadas com Flask-Migrate/Alembic.
-- Validar as métricas do dashboard com uma massa de dados controlada.
+- Implementar paginação server-side nas listagens operacionais.
+- Processar exportações pesadas em segundo plano em produção.
+- Utilizar armazenamento compartilhado para rate limiting em múltiplos workers.
